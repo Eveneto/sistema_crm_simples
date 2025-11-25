@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createBrowserClient } from '@supabase/ssr';
+import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,10 +21,7 @@ import { Loader2 } from 'lucide-react';
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = createClient();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,6 +29,18 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validação de e-mail
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        variant: 'destructive',
+        title: 'E-mail inválido',
+        description: 'Por favor, insira um e-mail válido',
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -41,13 +50,17 @@ export default function LoginPage() {
       });
 
       if (error) {
+        // Mensagens de erro traduzidas
+        const errorMessages: Record<string, string> = {
+          'Invalid login credentials': 'E-mail ou senha incorretos',
+          'Email not confirmed': 'Por favor, confirme seu e-mail antes de fazer login',
+          'Too many requests': 'Muitas tentativas. Aguarde alguns minutos.',
+        };
+
         toast({
           variant: 'destructive',
           title: 'Erro ao fazer login',
-          description:
-            error.message === 'Invalid login credentials'
-              ? 'E-mail ou senha incorretos'
-              : error.message,
+          description: errorMessages[error.message] || error.message,
         });
         return;
       }
@@ -61,6 +74,7 @@ export default function LoginPage() {
         router.refresh();
       }
     } catch (error) {
+      console.error('Login error:', error);
       toast({
         variant: 'destructive',
         title: 'Erro inesperado',

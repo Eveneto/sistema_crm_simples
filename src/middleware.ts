@@ -59,21 +59,49 @@ export async function middleware(request: NextRequest) {
   );
 
   // Atualizar sessão (importante para manter usuário logado)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-  // Se não está autenticado e está tentando acessar dashboard
-  if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    // Tratar erros de autenticação
+    if (error) {
+      console.error('Middleware auth error:', error);
+
+      // Se houver erro e está tentando acessar dashboard, redirecionar para login
+      if (request.nextUrl.pathname.startsWith('/dashboard')) {
+        return NextResponse.redirect(new URL('/login', request.url));
+      }
+
+      // Para outras rotas, permitir acesso
+      return response;
+    }
+
+    // Se não está autenticado e está tentando acessar dashboard
+    if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    // Se está autenticado e está tentando acessar login/register
+    if (
+      user &&
+      (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register')
+    ) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+
+    return response;
+  } catch (error) {
+    // Erro fatal: logar e redirecionar para login se estiver tentando acessar área protegida
+    console.error('Middleware fatal error:', error);
+
+    if (request.nextUrl.pathname.startsWith('/dashboard')) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    return response;
   }
-
-  // Se está autenticado e está tentando acessar login/register
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register')) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
-
-  return response;
 }
 
 export const config = {
