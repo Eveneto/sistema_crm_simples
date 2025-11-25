@@ -5,6 +5,9 @@ Sistema completo de CRM com integração WhatsApp, desenvolvido com Next.js 14, 
 ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
 ![Next.js](https://img.shields.io/badge/Next.js-14-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+🔗 **Repositório:** [github.com/Eveneto/sistema_crm_simples](https://github.com/Eveneto/sistema_crm_simples)
 
 ## 🚀 Stack Tecnológica
 
@@ -38,22 +41,26 @@ Sistema completo de CRM com integração WhatsApp, desenvolvido com Next.js 14, 
 ### Passo a passo
 
 1. **Clone o repositório:**
+
 ```bash
-git clone https://github.com/seu-usuario/crm-simplificado.git
-cd crm-simplificado
+git clone https://github.com/Eveneto/sistema_crm_simples.git
+cd sistema_crm_simples
 ```
 
 2. **Instale as dependências:**
+
 ```bash
 npm install
 ```
 
 3. **Configure as variáveis de ambiente:**
+
 ```bash
 cp .env.example .env.local
 ```
 
 Edite o arquivo `.env.local` com suas credenciais:
+
 ```env
 NEXT_PUBLIC_SUPABASE_URL=sua_url_do_supabase
 NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
@@ -62,11 +69,13 @@ EVOLUTION_API_KEY=sua_evolution_api_key
 ```
 
 4. **Configure o banco de dados Supabase:**
+
 - Acesse [supabase.com](https://supabase.com)
 - Crie um novo projeto
 - Execute os scripts SQL em `supabase/migrations/`
 
 5. **Rode o projeto em desenvolvimento:**
+
 ```bash
 npm run dev
 ```
@@ -175,7 +184,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 👥 Autores
 
-- Seu Nome - [@seu-usuario](https://github.com/seu-usuario)
+- Eveneto - [@Eveneto](https://github.com/Eveneto)
 
 ## 🙏 Agradecimentos
 
