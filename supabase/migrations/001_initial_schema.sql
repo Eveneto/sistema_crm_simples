@@ -195,6 +195,7 @@ CREATE TABLE IF NOT EXISTS activities (
   contact_id UUID NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
   deal_id UUID REFERENCES deals(id) ON DELETE CASCADE,
   assigned_to UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   due_date TIMESTAMP WITH TIME ZONE,
   completed BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -205,6 +206,7 @@ CREATE TABLE IF NOT EXISTS activities (
 CREATE INDEX idx_activities_contact ON activities(contact_id);
 CREATE INDEX idx_activities_deal ON activities(deal_id);
 CREATE INDEX idx_activities_assigned ON activities(assigned_to);
+CREATE INDEX idx_activities_created_by ON activities(created_by);
 CREATE INDEX idx_activities_due_date ON activities(due_date);
 CREATE INDEX idx_activities_completed ON activities(completed);
 
