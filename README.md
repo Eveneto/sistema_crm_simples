@@ -82,7 +82,20 @@ npm run dev
 
 Acesse [http://localhost:3000](http://localhost:3000)
 
-## 📁 Estrutura do Projeto
+## � Documentação do Projeto
+
+Este projeto possui documentação completa e profissional:
+
+| Documento                                          | Descrição                                     |
+| -------------------------------------------------- | --------------------------------------------- |
+| [CODE_REVIEW_GUIDE.md](CODE_REVIEW_GUIDE.md)       | Guia completo de Clean Code e Code Review     |
+| [PLANEJAMENTO_TECNICO.md](PLANEJAMENTO_TECNICO.md) | Arquitetura técnica e stack detalhada         |
+| [PLANEJAMENTO_SCRUM.md](PLANEJAMENTO_SCRUM.md)     | Metodologia Ágil Scrum + Roadmap de 6 sprints |
+| [TEMPLATES_SCRUM.md](TEMPLATES_SCRUM.md)           | Templates práticos para cerimônias e gestão   |
+| [CONTRIBUTING.md](CONTRIBUTING.md)                 | Guia de contribuição para desenvolvedores     |
+| [SETUP.md](SETUP.md)                               | Guia de instalação e configuração             |
+
+## �📁 Estrutura do Projeto
 
 ```
 src/
