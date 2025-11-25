@@ -1,6 +1,15 @@
 import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
 
-export default function HomePage() {
-  // Redireciona para o dashboard (será para login quando implementarmos auth)
-  redirect('/dashboard');
+export default async function HomePage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect('/dashboard');
+  } else {
+    redirect('/login');
+  }
 }
