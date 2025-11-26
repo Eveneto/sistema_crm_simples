@@ -1,9 +1,14 @@
 name: Deploy to Staging
 
+# TEMPORARIAMENTE DESABILITADO - Vercel secrets não configurados
+# Para habilitar: Configure VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID
+# Ver docs/GITHUB_SECRETS_SETUP.md para instruções
+
 on:
-  push:
-    branches: [sprint-2, sprint-3, sprint-4, sprint-5, sprint-6]
-  workflow_dispatch:
+  # Desabilitado - remova comentário para ativar
+  # push:
+  #   branches: [sprint-2, sprint-3, sprint-4, sprint-5, sprint-6]
+  workflow_dispatch: # Mantém opção de deploy manual
 
 jobs:
   deploy:
