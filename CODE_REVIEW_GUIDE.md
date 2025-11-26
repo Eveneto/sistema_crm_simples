@@ -6,13 +6,13 @@ Para programadores que desejam entregar código profissional, legível, mantíve
 
 Baseados nos maiores autores da engenharia de software:
 
-| Autor / Livro                          | Princípio chave                                                                                 | Aplicação prática no dia a dia                                      |
-|----------------------------------------|--------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
-| Robert C. Martin – Clean Code (2008)  | Código deve ser lido como prosa em inglês                                                       | Nomes significativos, funções curtas, uma responsabilidade por função |
-| SOLID (Robert Martin)                  | **S** – Single Responsibility<br>**O** – Open/Closed<br>**L** – Liskov Substitution<br>**I** – Interface Segregation<br>**D** – Dependency Inversion | Base de toda arquitetura saudável                                   |
-| Kent Beck                              | "Make it work → Make it right → Make it fast" (em ordem)                                        | Primeiro funcional, depois refatorar, por último otimizar          |
-| Sandi Metz                             | "Prefer duplication over the wrong abstraction"                                                | Não crie abstrações prematuras                                      |
-| Martin Fowler                          | Refactoring constante + "Code smells"                                                           | Identificar e eliminar cheiros de código                            |
+| Autor / Livro                        | Princípio chave                                                                                                                                      | Aplicação prática no dia a dia                                        |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Robert C. Martin – Clean Code (2008) | Código deve ser lido como prosa em inglês                                                                                                            | Nomes significativos, funções curtas, uma responsabilidade por função |
+| SOLID (Robert Martin)                | **S** – Single Responsibility<br>**O** – Open/Closed<br>**L** – Liskov Substitution<br>**I** – Interface Segregation<br>**D** – Dependency Inversion | Base de toda arquitetura saudável                                     |
+| Kent Beck                            | "Make it work → Make it right → Make it fast" (em ordem)                                                                                             | Primeiro funcional, depois refatorar, por último otimizar             |
+| Sandi Metz                           | "Prefer duplication over the wrong abstraction"                                                                                                      | Não crie abstrações prematuras                                        |
+| Martin Fowler                        | Refactoring constante + "Code smells"                                                                                                                | Identificar e eliminar cheiros de código                              |
 
 ---
 
@@ -25,14 +25,15 @@ Use nomes que revelam intenção (nunca `i`, `temp`, `data`):
 ```typescript
 // ❌ RUIM
 const d = 7;
-function handleClick() { }
+function handleClick() {}
 
 // ✅ BOM
 const deliveryDays = 7;
-function handleSubmitContactForm() { }
+function handleSubmitContactForm() {}
 ```
 
 **Regras de nomenclatura:**
+
 - **Classes/Types** → Substantivo: `Customer`, `Invoice`, `ContactFormData`
 - **Funções** → Verbo ou frase verbal: `sendWelcomeEmail()`, `isOverdue()`, `calculateTotal()`
 - **Booleanos** → prefixo `is`, `has`, `can`, `should`: `isActive`, `hasPermission`, `canEdit`, `shouldShowModal`
@@ -41,11 +42,11 @@ function handleSubmitContactForm() { }
 ```typescript
 // ❌ RUIM
 const usrMgr = new UserManager();
-const fn = () => { };
+const fn = () => {};
 
 // ✅ BOM
 const userManager = new UserManager();
-const formatCustomerName = () => { };
+const formatCustomerName = () => {};
 ```
 
 ---
@@ -61,19 +62,19 @@ const formatCustomerName = () => { };
 // ❌ RUIM - Faz muitas coisas
 function processOrder(order: Order) {
   // valida
-  if (!order.items.length) throw new Error("Empty order");
-  
+  if (!order.items.length) throw new Error('Empty order');
+
   // calcula
   const total = order.items.reduce((sum, item) => sum + item.price, 0);
-  
+
   // salva no banco
   db.orders.save({ ...order, total });
-  
+
   // envia email
-  sendEmail(order.customer.email, "Order confirmed");
-  
+  sendEmail(order.customer.email, 'Order confirmed');
+
   // atualiza estoque
-  order.items.forEach(item => updateStock(item.id, -item.quantity));
+  order.items.forEach((item) => updateStock(item.id, -item.quantity));
 }
 
 // ✅ BOM - Cada função faz uma coisa
@@ -116,7 +117,7 @@ function getDiscount(user: User, order: Order) {
 // ✅ BOM - Early return
 function getDiscount(user: User, order: Order): number {
   if (!user || !user.isPremium) return 0;
-  
+
   return order.total > 100 ? order.total * 0.2 : order.total * 0.1;
 }
 ```
@@ -139,21 +140,21 @@ function CustomerList() {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('');
-  
+
   useEffect(() => {
     setLoading(true);
     fetch('/api/customers')
-      .then(res => res.json())
-      .then(data => setCustomers(data))
+      .then((res) => res.json())
+      .then((data) => setCustomers(data))
       .finally(() => setLoading(false));
   }, []);
-  
-  const filtered = customers.filter(c => c.name.includes(filter));
-  
+
+  const filtered = customers.filter((c) => c.name.includes(filter));
+
   return (
     <div>
-      <input value={filter} onChange={e => setFilter(e.target.value)} />
-      {loading ? <Spinner /> : filtered.map(c => <CustomerCard key={c.id} customer={c} />)}
+      <input value={filter} onChange={(e) => setFilter(e.target.value)} />
+      {loading ? <Spinner /> : filtered.map((c) => <CustomerCard key={c.id} customer={c} />)}
     </div>
   );
 }
@@ -163,11 +164,11 @@ function useCustomers() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  
+
   useEffect(() => {
     loadCustomers();
   }, []);
-  
+
   async function loadCustomers() {
     setLoading(true);
     try {
@@ -179,21 +180,21 @@ function useCustomers() {
       setLoading(false);
     }
   }
-  
+
   return { customers, loading, error, reload: loadCustomers };
 }
 
 function CustomerList() {
   const { customers, loading, error } = useCustomers();
   const [filter, setFilter] = useState('');
-  
-  const filteredCustomers = customers.filter(c => 
+
+  const filteredCustomers = customers.filter((c) =>
     c.name.toLowerCase().includes(filter.toLowerCase())
   );
-  
+
   if (error) return <ErrorMessage error={error} />;
   if (loading) return <Spinner />;
-  
+
   return (
     <div>
       <SearchInput value={filter} onChange={setFilter} />
@@ -225,7 +226,10 @@ async function createCustomer(data: any) {
 
 // ✅ BOM
 class CustomerCreationError extends Error {
-  constructor(message: string, public cause?: Error) {
+  constructor(
+    message: string,
+    public cause?: Error
+  ) {
     super(message);
     this.name = 'CustomerCreationError';
   }
@@ -237,10 +241,7 @@ async function createCustomer(data: CustomerInput): Promise<Customer> {
     const customer = await db.customers.create(data);
     return customer;
   } catch (error) {
-    throw new CustomerCreationError(
-      `Failed to create customer: ${data.email}`,
-      error as Error
-    );
+    throw new CustomerCreationError(`Failed to create customer: ${data.email}`, error as Error);
   }
 }
 ```
@@ -307,11 +308,18 @@ Use em **todo Pull Request**:
 - [ ] Queries SQL parametrizadas (se usar raw SQL)
 - [ ] Não há queries N+1 (banco de dados)
 
-### Testes
+### Testes ⚠️ **NÃO TESTADO = NÃO APROVADO**
 
-- [ ] Novos comportamentos têm teste unitário ou e2e
-- [ ] Testes existentes continuam passando
-- [ ] Cobertura de testes não diminuiu
+- [ ] **Política obrigatória**: Todo código novo tem testes
+- [ ] Testes unitários para funções e utils
+- [ ] Testes de integração para componentes React
+- [ ] Testes de hooks customizados
+- [ ] Cobertura mínima de 60% atingida (branches, functions, lines, statements)
+- [ ] Todos os testes estão passando (`npm test`)
+- [ ] Testes seguem o princípio AAA (Arrange-Act-Assert)
+- [ ] Nomes de testes descritivos (`deve renderizar formulário`, não `test1`)
+- [ ] Mocks simples e diretos (princípio KISS)
+- [ ] Queries acessíveis (`getByRole`, `getByLabelText` > `getByTestId`)
 
 ### UI/UX
 
@@ -326,16 +334,16 @@ Use em **todo Pull Request**:
 
 Detecte e corrija rapidamente:
 
-| Smell                          | Como identificar                                   | Como corrigir                                      |
-|--------------------------------|----------------------------------------------------|----------------------------------------------------|
-| **Função grande**              | > 30 linhas                                        | Extrair funções menores                            |
-| **Parâmetro booleano**         | `sendEmail(user, true)`                            | Criar duas funções específicas                     |
-| **Duplicação**                 | Mesmo bloco em 3+ lugares                          | Extrair função/componente                          |
-| **Feature Envy**               | Método usa mais dados de outra classe              | Mover método para a classe certa                   |
-| **Long Parameter List**        | Função com 5+ parâmetros                           | Criar objeto de configuração                       |
-| **Magic numbers/strings**      | `if (status === 3)`                                | Criar enum ou constante nomeada                    |
-| **Comentário desnecessário**   | Comenta o óbvio                                    | Remover e melhorar nomes                           |
-| **Código morto**               | Código comentado ou nunca usado                    | Deletar (está no git)                              |
+| Smell                        | Como identificar                      | Como corrigir                    |
+| ---------------------------- | ------------------------------------- | -------------------------------- |
+| **Função grande**            | > 30 linhas                           | Extrair funções menores          |
+| **Parâmetro booleano**       | `sendEmail(user, true)`               | Criar duas funções específicas   |
+| **Duplicação**               | Mesmo bloco em 3+ lugares             | Extrair função/componente        |
+| **Feature Envy**             | Método usa mais dados de outra classe | Mover método para a classe certa |
+| **Long Parameter List**      | Função com 5+ parâmetros              | Criar objeto de configuração     |
+| **Magic numbers/strings**    | `if (status === 3)`                   | Criar enum ou constante nomeada  |
+| **Comentário desnecessário** | Comenta o óbvio                       | Remover e melhorar nomes         |
+| **Código morto**             | Código comentado ou nunca usado       | Deletar (está no git)            |
 
 ### Exemplos práticos:
 
@@ -349,7 +357,7 @@ if (user.role === 2) {
 enum UserRole {
   USER = 1,
   ADMIN = 2,
-  MANAGER = 3
+  MANAGER = 3,
 }
 
 if (user.role === UserRole.ADMIN) {
@@ -367,7 +375,7 @@ function createOrder(
   paymentMethod: string,
   discount: number,
   notes: string
-) { }
+) {}
 
 // ✅ CORREÇÃO: Objeto de configuração
 interface CreateOrderParams {
@@ -380,7 +388,7 @@ interface CreateOrderParams {
   notes?: string;
 }
 
-function createOrder(params: CreateOrderParams) { }
+function createOrder(params: CreateOrderParams) {}
 ```
 
 ---
@@ -405,10 +413,10 @@ function createOrder(params: CreateOrderParams) { }
 ### Exemplos de comentários de review:
 
 ```
-🔴 BLOQUEANTE: Esta query SQL está vulnerável a SQL injection. 
+🔴 BLOQUEANTE: Esta query SQL está vulnerável a SQL injection.
 Use prepared statements.
 
-🟡 nit: Considere extrair esta lógica para um hook customizado 
+🟡 nit: Considere extrair esta lógica para um hook customizado
 para melhorar a reutilização.
 
 ✅ LGTM! (Looks Good To Me) Ótima abstração do hook de autenticação.
@@ -419,6 +427,7 @@ para melhorar a reutilização.
 ## 6. Ferramentas Recomendadas
 
 ### Linting e Formatação
+
 ```bash
 # Instalar
 npm install -D eslint prettier eslint-config-next eslint-config-prettier
@@ -444,6 +453,7 @@ npm install -D @typescript-eslint/parser @typescript-eslint/eslint-plugin
 ```
 
 ### Git Hooks (Husky + lint-staged)
+
 ```bash
 npm install -D husky lint-staged
 
@@ -461,10 +471,12 @@ npx husky add .husky/pre-commit "npx lint-staged"
 ```
 
 ### Análise Estática
+
 - **SonarQube** ou **CodeClimate** (análise de qualidade, cobertura, vulnerabilidades)
 - **Snyk** (vulnerabilidades em dependências)
 
 ### CI/CD (GitHub Actions)
+
 ```yaml
 # .github/workflows/quality.yml
 name: Code Quality
@@ -491,14 +503,14 @@ jobs:
 
 ### Como medir se o código está limpo:
 
-| Métrica                        | Valor ideal        | Como medir                           |
-|--------------------------------|--------------------|--------------------------------------|
-| **Complexidade ciclomática**   | ≤ 10 por função    | SonarQube, ESLint complexity rule    |
-| **Cobertura de testes**        | ≥ 80%              | Jest coverage report                 |
-| **Duplicação de código**       | ≤ 3%               | SonarQube, jscpd                     |
-| **Dívida técnica**             | ≤ 5% do tempo dev  | SonarQube technical debt ratio       |
-| **Tempo de review**            | ≤ 24h              | GitHub/GitLab analytics              |
-| **Tamanho do PR**              | ≤ 400 linhas       | GitHub/GitLab PR stats               |
+| Métrica                      | Valor ideal       | Como medir                        |
+| ---------------------------- | ----------------- | --------------------------------- |
+| **Complexidade ciclomática** | ≤ 10 por função   | SonarQube, ESLint complexity rule |
+| **Cobertura de testes**      | ≥ 80%             | Jest coverage report              |
+| **Duplicação de código**     | ≤ 3%              | SonarQube, jscpd                  |
+| **Dívida técnica**           | ≤ 5% do tempo dev | SonarQube technical debt ratio    |
+| **Tempo de review**          | ≤ 24h             | GitHub/GitLab analytics           |
+| **Tamanho do PR**            | ≤ 400 linhas      | GitHub/GitLab PR stats            |
 
 ---
 
@@ -514,31 +526,31 @@ function Dashboard() {
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
-  
+
   useEffect(() => {
     fetch('/api/deals')
-      .then(r => r.json())
-      .then(d => {
+      .then((r) => r.json())
+      .then((d) => {
         setDeals(d);
         setLoading(false);
       });
   }, []);
-  
+
   return (
     <div>
-      <select value={filter} onChange={e => setFilter(e.target.value)}>
+      <select value={filter} onChange={(e) => setFilter(e.target.value)}>
         <option value="all">Todos</option>
         <option value="open">Abertos</option>
         <option value="won">Ganhos</option>
       </select>
-      
+
       {loading ? (
         <div>Carregando...</div>
       ) : (
         <div>
           {deals
-            .filter(d => filter === 'all' || d.status === filter)
-            .map(d => (
+            .filter((d) => filter === 'all' || d.status === filter)
+            .map((d) => (
               <div key={d.id}>
                 <h3>{d.title}</h3>
                 <p>{d.value}</p>
@@ -556,11 +568,11 @@ export function useDeals() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  
+
   useEffect(() => {
     loadDeals();
   }, []);
-  
+
   async function loadDeals() {
     try {
       const data = await fetchDeals();
@@ -571,7 +583,7 @@ export function useDeals() {
       setLoading(false);
     }
   }
-  
+
   return { deals, loading, error, reload: loadDeals };
 }
 
@@ -583,7 +595,7 @@ interface DealFilterProps {
 
 export function DealFilter({ value, onChange }: DealFilterProps) {
   return (
-    <select value={value} onChange={e => onChange(e.target.value as DealStatus)}>
+    <select value={value} onChange={(e) => onChange(e.target.value as DealStatus)}>
       <option value="all">Todos</option>
       <option value="open">Abertos</option>
       <option value="won">Ganhos</option>
@@ -609,12 +621,12 @@ export function DealCard({ deal }: DealCardProps) {
 export function Dashboard() {
   const { deals, loading, error } = useDeals();
   const [filter, setFilter] = useState<DealStatus>('all');
-  
+
   const filteredDeals = useFilteredDeals(deals, filter);
-  
+
   if (error) return <ErrorMessage error={error} />;
   if (loading) return <LoadingSpinner />;
-  
+
   return (
     <div className="dashboard">
       <DealFilter value={filter} onChange={setFilter} />
@@ -671,4 +683,4 @@ Quem segue rigorosamente este guia reduz em até **70% o tempo de manutenção**
 **Última atualização:** 25 de novembro de 2025  
 **Versão:** 1.0.0
 
-*Mantenha este guia vivo: proponha melhorias via PR!*
+_Mantenha este guia vivo: proponha melhorias via PR!_

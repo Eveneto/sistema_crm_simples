@@ -493,17 +493,22 @@ Uma User Story está pronta para desenvolvimento quando:
 
 ### 5.2 Definition of Done (DoD)
 
+⚠️ **POLÍTICA OBRIGATÓRIA: NÃO TESTADO = NÃO APROVADO**
+
 Uma User Story está completa quando:
 
 - [ ] Código desenvolvido e commitado
+- [ ] **Testes unitários escritos** (cobertura mínima ≥ 60%)
+- [ ] **Testes de integração** para componentes React
+- [ ] **Testes de hooks** customizados
+- [ ] **Todos os testes passando** (`npm test`)
 - [ ] Code review aprovado (mínimo 1 aprovação)
-- [ ] Testes unitários escritos (coverage ≥ 80%)
-- [ ] Testes de integração (se aplicável)
 - [ ] Build passa sem erros/warnings
 - [ ] Deploy em staging realizado
-- [ ] Documentação atualizada
+- [ ] Documentação atualizada (incluindo TESTING_GUIDE.md)
 - [ ] PO aceitou a entrega
 - [ ] Segue 100% o CODE_REVIEW_GUIDE.md
+- [ ] Princípio KISS aplicado aos testes (simplicidade)
 
 ### 5.3 Métricas de Qualidade
 
