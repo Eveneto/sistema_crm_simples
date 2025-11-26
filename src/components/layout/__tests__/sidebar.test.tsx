@@ -3,15 +3,17 @@ import { Sidebar } from '../sidebar';
 
 const mockUseUserRole = jest.fn();
 const mockUsePathname = jest.fn();
+const mockUseRouter = jest.fn();
 
 // Mock do useUserRole
 jest.mock('@/hooks/use-user-role', () => ({
-  useUserRole: mockUseUserRole,
+  useUserRole: () => mockUseUserRole(),
 }));
 
-// Mock do usePathname
+// Mock do Next.js navigation
 jest.mock('next/navigation', () => ({
-  usePathname: mockUsePathname,
+  usePathname: () => mockUsePathname(),
+  useRouter: () => mockUseRouter(),
 }));
 
 describe('Sidebar', () => {

@@ -2,10 +2,19 @@ import { render, screen } from '@testing-library/react';
 import { Header } from '../header';
 
 const mockUseUserRole = jest.fn();
+const mockPush = jest.fn();
+const mockToast = jest.fn();
 
 // Mock do useUserRole
 jest.mock('@/hooks/use-user-role', () => ({
-  useUserRole: mockUseUserRole,
+  useUserRole: () => mockUseUserRole(),
+}));
+
+// Mock do Next.js router
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
 }));
 
 // Mock do ThemeToggle
@@ -16,7 +25,16 @@ jest.mock('@/components/theme-toggle', () => ({
 // Mock do useToast
 jest.mock('@/hooks/use-toast', () => ({
   useToast: () => ({
-    toast: jest.fn(),
+    toast: mockToast,
+  }),
+}));
+
+// Mock do Supabase createClient
+jest.mock('@/lib/supabase/client', () => ({
+  createClient: () => ({
+    auth: {
+      signOut: jest.fn().mockResolvedValue({ error: null }),
+    },
   }),
 }));
 
