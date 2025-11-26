@@ -91,10 +91,7 @@ export async function GET(request: NextRequest) {
     const { data: salesData } = await supabase.from('deals').select('value').eq('status', 'won');
 
     const totalSales =
-      salesData?.reduce((sum, deal) => {
-        const dealValue = (deal as { value?: number }).value || 0;
-        return sum + dealValue;
-      }, 0) || 0;
+      salesData?.reduce((sum, deal) => sum + ((deal as { value?: number }).value || 0), 0) || 0;
 
     // 10. Vendas do período anterior
     const { data: previousSalesData } = await supabase
@@ -104,10 +101,10 @@ export async function GET(request: NextRequest) {
       .lt('created_at', startDate.toISOString());
 
     const previousTotalSales =
-      previousSalesData?.reduce((sum, deal) => {
-        const dealValue = (deal as { value?: number }).value || 0;
-        return sum + dealValue;
-      }, 0) || 0;
+      previousSalesData?.reduce(
+        (sum, deal) => sum + ((deal as { value?: number }).value || 0),
+        0
+      ) || 0;
 
     // Calcular tendências (% de mudança)
     const calculateTrend = (current: number, previous: number): number => {
@@ -132,7 +129,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(metrics);
   } catch (error) {
-    // Log error for debugging
     if (error instanceof Error) {
       console.error('Error fetching dashboard metrics:', error.message);
     }
