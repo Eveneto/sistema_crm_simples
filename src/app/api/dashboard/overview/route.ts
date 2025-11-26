@@ -87,6 +87,28 @@ export async function GET(request: NextRequest) {
       .gte('created_at', previousStartDate.toISOString())
       .lt('created_at', startDate.toISOString());
 
+    // 9. Total de vendas (soma de valores de negócios ganhos)
+    const { data: salesData } = await supabase.from('deals').select('value').eq('status', 'won');
+
+    const totalSales =
+      salesData?.reduce((sum, deal) => {
+        const dealValue = (deal as { value?: number }).value || 0;
+        return sum + dealValue;
+      }, 0) || 0;
+
+    // 10. Vendas do período anterior
+    const { data: previousSalesData } = await supabase
+      .from('deals')
+      .select('value')
+      .eq('status', 'won')
+      .lt('created_at', startDate.toISOString());
+
+    const previousTotalSales =
+      previousSalesData?.reduce((sum, deal) => {
+        const dealValue = (deal as { value?: number }).value || 0;
+        return sum + dealValue;
+      }, 0) || 0;
+
     // Calcular tendências (% de mudança)
     const calculateTrend = (current: number, previous: number): number => {
       if (previous === 0) return current > 0 ? 100 : 0;
@@ -98,17 +120,22 @@ export async function GET(request: NextRequest) {
       activeConversations: activeConversations || 0,
       conversionRate,
       newContacts: newContacts || 0,
+      totalSales,
       trends: {
         contacts: calculateTrend(totalContacts || 0, previousContacts || 0),
         conversations: calculateTrend(activeConversations || 0, previousConversations || 0),
         conversion: conversionRate - previousConversionRate,
         newContacts: calculateTrend(newContacts || 0, previousNewContacts || 0),
+        sales: calculateTrend(totalSales, previousTotalSales),
       },
     };
 
     return NextResponse.json(metrics);
   } catch (error) {
-    console.error('Error fetching dashboard metrics:', error);
+    // Log error for debugging
+    if (error instanceof Error) {
+      console.error('Error fetching dashboard metrics:', error.message);
+    }
     return NextResponse.json({ error: 'Failed to fetch metrics' }, { status: 500 });
   }
 }

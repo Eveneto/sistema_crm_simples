@@ -1,6 +1,6 @@
 import { LucideIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { TrendIndicator } from './trend-indicator';
 
 export interface KPICardProps {
   title: string;
@@ -49,16 +49,8 @@ export function KPICard({
         <div className="text-2xl font-bold">{value}</div>
         {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
         {trend && (
-          <div className="mt-2 flex items-center gap-1">
-            <span
-              className={cn(
-                'text-xs font-medium',
-                trend.isPositive ? 'text-green-600' : 'text-red-600'
-              )}
-            >
-              {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
-            </span>
-            <span className="text-xs text-muted-foreground">vs período anterior</span>
+          <div className="mt-2">
+            <TrendIndicator value={trend.value} isPositive={trend.isPositive} />
           </div>
         )}
       </CardContent>
