@@ -63,4 +63,42 @@ describe('LoginPage', () => {
 
     expect(passwordInput.value).toBe('password123');
   });
+
+  it('deve ter botão de submit com tipo correto', () => {
+    render(<LoginPage />);
+
+    const submitButton = screen.getByRole('button', { name: /entrar/i });
+    expect(submitButton).toHaveAttribute('type', 'submit');
+  });
+
+  it('deve ter placeholder nos campos', () => {
+    render(<LoginPage />);
+
+    const emailInput = screen.getByLabelText(/e-mail/i);
+    const passwordInput = screen.getByLabelText(/senha/i);
+
+    expect(emailInput).toHaveAttribute('placeholder');
+    expect(passwordInput).toHaveAttribute('placeholder');
+  });
+
+  it('deve ter autocomplete configurado', () => {
+    render(<LoginPage />);
+
+    const emailInput = screen.getByLabelText(/e-mail/i);
+    const passwordInput = screen.getByLabelText(/senha/i);
+
+    expect(emailInput).toHaveAttribute('autocomplete', 'email');
+    expect(passwordInput).toHaveAttribute('autocomplete', 'current-password');
+  });
+
+  it('deve limpar campos após entrada', () => {
+    render(<LoginPage />);
+
+    const emailInput = screen.getByLabelText(/e-mail/i) as HTMLInputElement;
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    expect(emailInput.value).toBe('test@example.com');
+
+    fireEvent.change(emailInput, { target: { value: '' } });
+    expect(emailInput.value).toBe('');
+  });
 });
