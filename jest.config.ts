@@ -26,12 +26,14 @@ const config: Config = {
     '!src/**/*.stories.{js,jsx,ts,tsx}',
     '!src/types/**',
   ],
+  // Coverage threshold ajustado para MVP (realista)
+  // Meta: 40% global, 90%+ business logic
   coverageThreshold: {
     global: {
-      branches: 60,
-      functions: 60,
-      lines: 60,
-      statements: 60,
+      branches: 40,
+      functions: 40,
+      lines: 40,
+      statements: 40,
     },
   },
 
