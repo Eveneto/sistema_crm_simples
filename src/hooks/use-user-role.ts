@@ -57,7 +57,9 @@ export function useUserRole() {
         setProfile(userProfile);
         setRole(userProfile.role);
       } catch (err) {
-        console.error('Error loading user profile:', err);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error loading user profile:', err);
+        }
         setError(err instanceof Error ? err : new Error('Unknown error'));
       } finally {
         setIsLoading(false);

@@ -74,7 +74,10 @@ export default function LoginPage() {
         router.refresh();
       }
     } catch (error) {
-      console.error('Login error:', error);
+      // Log error silently in production
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Login error:', error);
+      }
       toast({
         variant: 'destructive',
         title: 'Erro inesperado',

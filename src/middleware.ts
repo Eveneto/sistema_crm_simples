@@ -67,7 +67,10 @@ export async function middleware(request: NextRequest) {
 
     // Tratar erros de autenticação
     if (error) {
-      console.error('Middleware auth error:', error);
+      // Log error only in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Middleware auth error:', error);
+      }
 
       // Se houver erro e está tentando acessar dashboard, redirecionar para login
       if (request.nextUrl.pathname.startsWith('/dashboard')) {
@@ -94,7 +97,9 @@ export async function middleware(request: NextRequest) {
     return response;
   } catch (error) {
     // Erro fatal: logar e redirecionar para login se estiver tentando acessar área protegida
-    console.error('Middleware fatal error:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Middleware fatal error:', error);
+    }
 
     if (request.nextUrl.pathname.startsWith('/dashboard')) {
       return NextResponse.redirect(new URL('/login', request.url));

@@ -14,6 +14,14 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+  // Ignorar pasta evolution-api durante o build
+  webpack: (config, { isServer }) => {
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/node_modules', '**/evolution-api/**'],
+    };
+    return config;
+  },
 };
 
 module.exports = nextConfig;

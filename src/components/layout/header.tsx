@@ -44,7 +44,9 @@ export function Header() {
       router.push('/login');
       router.refresh();
     } catch (error) {
-      console.error('Logout error:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Logout error:', error);
+      }
       toast({
         variant: 'destructive',
         title: 'Erro inesperado',
