@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Contact, ContactListResponse } from '@/types/contact';
 import { ContactCard } from './contact-card';
+import { TagFilter } from './tag-filter';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -16,6 +17,8 @@ export function ContactsList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({
     total: 0,
@@ -28,7 +31,29 @@ export function ContactsList() {
 
   useEffect(() => {
     fetchContacts();
-  }, [page, debouncedSearch]);
+  }, [page, debouncedSearch, selectedTags]);
+
+  useEffect(() => {
+    fetchAvailableTags();
+  }, []);
+
+  async function fetchAvailableTags() {
+    try {
+      const response = await fetch('/api/contacts?limit=1000');
+      if (!response.ok) return;
+
+      const data: ContactListResponse = await response.json();
+      const tagsSet = new Set<string>();
+
+      data.data.forEach((contact) => {
+        contact.tags?.forEach((tag) => tagsSet.add(tag));
+      });
+
+      setAvailableTags(Array.from(tagsSet).sort());
+    } catch (err) {
+      console.error('Erro ao buscar tags:', err);
+    }
+  }
 
   async function fetchContacts() {
     try {
@@ -44,6 +69,10 @@ export function ContactsList() {
 
       if (debouncedSearch) {
         params.append('search', debouncedSearch);
+      }
+
+      if (selectedTags.length > 0) {
+        params.append('tags', selectedTags.join(','));
       }
 
       const response = await fetch(`/api/contacts?${params.toString()}`);
@@ -94,8 +123,8 @@ export function ContactsList() {
 
   return (
     <div className="space-y-4">
-      {/* Busca */}
-      <div className="flex items-center gap-2">
+      {/* Busca e Filtros */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -105,6 +134,11 @@ export function ContactsList() {
             className="pl-9"
           />
         </div>
+        <TagFilter
+          availableTags={availableTags}
+          selectedTags={selectedTags}
+          onChange={setSelectedTags}
+        />
       </div>
 
       {/* Lista */}
@@ -117,9 +151,7 @@ export function ContactsList() {
             {search ? 'Nenhum contato encontrado' : 'Nenhum contato cadastrado'}
           </h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            {search
-              ? 'Tente buscar com outros termos'
-              : 'Comece adicionando seu primeiro contato'}
+            {search ? 'Tente buscar com outros termos' : 'Comece adicionando seu primeiro contato'}
           </p>
         </div>
       ) : (
