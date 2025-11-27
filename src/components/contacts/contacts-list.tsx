@@ -11,6 +11,7 @@ import { useDebounce } from '@/hooks/use-debounce';
 import { ContactsListSkeleton } from './contacts-list-skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export function ContactsList() {
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -31,6 +32,7 @@ export function ContactsList() {
 
   useEffect(() => {
     fetchContacts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, debouncedSearch, selectedTags]);
 
   useEffect(() => {
@@ -39,19 +41,15 @@ export function ContactsList() {
 
   async function fetchAvailableTags() {
     try {
-      const response = await fetch('/api/contacts?limit=1000');
+      const response = await fetch('/api/tags');
       if (!response.ok) return;
 
-      const data: ContactListResponse = await response.json();
-      const tagsSet = new Set<string>();
-
-      data.data.forEach((contact) => {
-        contact.tags?.forEach((tag) => tagsSet.add(tag));
-      });
-
-      setAvailableTags(Array.from(tagsSet).sort());
+      const data = await response.json();
+      setAvailableTags(data.tags || []);
     } catch (err) {
-      console.error('Erro ao buscar tags:', err);
+      logger.error('Failed to fetch available tags', {
+        error: err instanceof Error ? err.message : 'Unknown error',
+      });
     }
   }
 

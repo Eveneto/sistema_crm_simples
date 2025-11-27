@@ -1,16 +1,19 @@
+export type ContactStatus = 'lead' | 'client' | 'inactive';
+
+export interface CustomFields {
+  company?: string;
+  position?: string;
+  status?: ContactStatus;
+  notes?: string;
+}
+
 export interface Contact {
   id: string;
   name: string;
   email: string | null;
   phone: string | null;
   tags: string[] | null;
-  custom_fields: {
-    company?: string;
-    position?: string;
-    status?: string;
-    notes?: string;
-    [key: string]: any;
-  } | null;
+  custom_fields: CustomFields | null;
   created_at: string;
   updated_at: string;
 }

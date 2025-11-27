@@ -16,16 +16,14 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface DeleteContactButtonProps {
   contactId: string;
   contactName: string;
 }
 
-export function DeleteContactButton({
-  contactId,
-  contactName,
-}: DeleteContactButtonProps) {
+export function DeleteContactButton({ contactId, contactName }: DeleteContactButtonProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -53,7 +51,10 @@ export function DeleteContactButton({
       router.push('/dashboard/contacts');
       router.refresh();
     } catch (error) {
-      console.error('Erro ao excluir contato:', error);
+      logger.error('Failed to delete contact', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        contactId,
+      });
       toast({
         title: 'Erro ao excluir',
         description:
@@ -89,8 +90,8 @@ export function DeleteContactButton({
           <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
           <AlertDialogDescription>
             Esta ação não pode ser desfeita. O contato{' '}
-            <span className="font-semibold text-foreground">{contactName}</span>{' '}
-            será permanentemente excluído do sistema.
+            <span className="font-semibold text-foreground">{contactName}</span> será
+            permanentemente excluído do sistema.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

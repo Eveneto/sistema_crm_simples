@@ -9,36 +9,29 @@ export const contactSchema = z.object({
     .string()
     .min(2, 'Nome deve ter no mínimo 2 caracteres')
     .max(100, 'Nome deve ter no máximo 100 caracteres'),
-  
-  email: z
-    .string()
-    .email('Email inválido')
-    .toLowerCase()
-    .optional()
-    .or(z.literal('')),
-  
+
+  email: z.string().email('Email inválido').toLowerCase().optional().or(z.literal('')),
+
   phone: z
     .string()
     .regex(phoneRegex, 'Telefone inválido. Use formato: (11) 99999-9999')
     .optional()
     .or(z.literal('')),
-  
+
   company: z
     .string()
     .max(100, 'Nome da empresa deve ter no máximo 100 caracteres')
     .optional()
     .or(z.literal('')),
-  
+
   position: z
     .string()
     .max(100, 'Cargo deve ter no máximo 100 caracteres')
     .optional()
     .or(z.literal('')),
-  
-  tags: z
-    .array(z.string())
-    .default([]),
-  
+
+  tags: z.array(z.string()).optional().default([]),
+
   notes: z
     .string()
     .max(500, 'Notas devem ter no máximo 500 caracteres')
@@ -49,13 +42,10 @@ export const contactSchema = z.object({
 export type ContactFormData = z.infer<typeof contactSchema>;
 
 // Schema para criação (garante que pelo menos email OU telefone existe)
-export const createContactSchema = contactSchema.refine(
-  (data) => data.email || data.phone,
-  {
-    message: 'Pelo menos email ou telefone deve ser fornecido',
-    path: ['email'],
-  }
-);
+export const createContactSchema = contactSchema.refine((data) => data.email || data.phone, {
+  message: 'Pelo menos email ou telefone deve ser fornecido',
+  path: ['email'],
+});
 
 // Schema para atualização (todos os campos são opcionais)
 export const updateContactSchema = contactSchema.partial();

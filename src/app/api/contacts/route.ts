@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
+import { CustomFields } from '@/types/contact';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,10 +16,7 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Não autorizado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     // Extrair parâmetros da query
@@ -33,9 +32,7 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit;
 
     // Construir query base
-    let query = supabase
-      .from('contacts')
-      .select('*', { count: 'exact' });
+    let query = supabase.from('contacts').select('*', { count: 'exact' });
 
     // Aplicar busca (full-text search)
     if (search) {
@@ -60,7 +57,10 @@ export async function GET(request: NextRequest) {
     const { data: contacts, error, count } = await query;
 
     if (error) {
-      console.error('Erro ao buscar contatos:', error);
+      logger.error('Failed to fetch contacts', {
+        error: error.message,
+        userId: user.id,
+      });
       return NextResponse.json(
         { error: 'Erro ao buscar contatos', details: error.message },
         { status: 500 }
@@ -82,11 +82,11 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Erro inesperado na API de contatos:', error);
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    );
+    logger.error('Unexpected error in contacts API', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      endpoint: 'GET /api/contacts',
+    });
+    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
   }
 }
 
@@ -101,10 +101,7 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Não autorizado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     // Parse do body
@@ -112,14 +109,14 @@ export async function POST(request: NextRequest) {
 
     // Validar dados com Zod
     const { createContactSchema } = await import('@/lib/validations/contact');
-    
+
     const validation = createContactSchema.safeParse(body);
-    
+
     if (!validation.success) {
       return NextResponse.json(
-        { 
-          error: 'Dados inválidos', 
-          details: validation.error.flatten().fieldErrors 
+        {
+          error: 'Dados inválidos',
+          details: validation.error.flatten().fieldErrors,
         },
         { status: 400 }
       );
@@ -129,9 +126,7 @@ export async function POST(request: NextRequest) {
 
     // Verificar duplicatas (email ou telefone)
     if (email || phone) {
-      let duplicateQuery = supabase
-        .from('contacts')
-        .select('id, name, email, phone');
+      let duplicateQuery = supabase.from('contacts').select('id, name, email, phone');
 
       if (email && phone) {
         duplicateQuery = duplicateQuery.or(`email.eq.${email},phone.eq.${phone}`);
@@ -144,17 +139,22 @@ export async function POST(request: NextRequest) {
       const { data: duplicates } = await duplicateQuery;
 
       if (duplicates && duplicates.length > 0) {
-        const duplicate = duplicates[0] as { id: string; name: string; email: string | null; phone: string | null };
+        const duplicate = duplicates[0] as {
+          id: string;
+          name: string;
+          email: string | null;
+          phone: string | null;
+        };
         return NextResponse.json(
-          { 
+          {
             error: 'Contato já existe',
             details: {
               message: `Já existe um contato com este ${duplicate.email === email ? 'email' : 'telefone'}`,
               existingContact: {
                 id: duplicate.id,
                 name: duplicate.name,
-              }
-            }
+              },
+            },
           },
           { status: 409 }
         );
@@ -162,12 +162,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Preparar custom_fields
-    const customFields: Record<string, any> = { status: 'lead' };
-    if (company) customFields.company = company;
-    if (position) customFields.position = position;
-    if (notes) customFields.notes = notes;
+    const customFields: CustomFields = {
+      status: 'lead',
+      ...(company && { company }),
+      ...(position && { position }),
+      ...(notes && { notes }),
+    };
 
     // Inserir contato
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: newContact, error: insertError } = await supabase
       .from('contacts')
       .insert({
@@ -176,12 +179,16 @@ export async function POST(request: NextRequest) {
         phone: phone || null,
         tags: tags || [],
         custom_fields: customFields,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any)
       .select()
       .single();
 
     if (insertError) {
-      console.error('Erro ao criar contato:', insertError);
+      logger.error('Failed to create contact', {
+        error: insertError.message,
+        userId: user.id,
+      });
       return NextResponse.json(
         { error: 'Erro ao criar contato', details: insertError.message },
         { status: 500 }
@@ -189,19 +196,18 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { 
+      {
         message: 'Contato criado com sucesso',
-        data: newContact 
+        data: newContact,
       },
       { status: 201 }
     );
-
   } catch (error) {
-    console.error('Erro inesperado ao criar contato:', error);
+    logger.error('Unexpected error creating contact', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      endpoint: 'POST /api/contacts',
+    });
 
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
   }
 }

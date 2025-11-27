@@ -20,11 +20,11 @@ interface ContactFormProps {
   onSuccess?: () => void;
 }
 
-export function ContactForm({ 
-  initialData, 
+export function ContactForm({
+  initialData,
   mode = 'create',
   contactId,
-  onSuccess 
+  onSuccess,
 }: ContactFormProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -37,6 +37,7 @@ export function ContactForm({
     setValue,
     watch,
   } = useForm<ContactFormData>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(contactSchema) as any,
     defaultValues: {
       name: initialData?.name || '',
@@ -55,10 +56,8 @@ export function ContactForm({
     try {
       setIsSubmitting(true);
 
-      const url = mode === 'create' 
-        ? '/api/contacts' 
-        : `/api/contacts/${contactId}`;
-      
+      const url = mode === 'create' ? '/api/contacts' : `/api/contacts/${contactId}`;
+
       const method = mode === 'create' ? 'POST' : 'PATCH';
 
       const response = await fetch(url, {
@@ -85,9 +84,8 @@ export function ContactForm({
 
       toast({
         title: mode === 'create' ? 'Contato criado!' : 'Contato atualizado!',
-        description: mode === 'create' 
-          ? 'O contato foi adicionado com sucesso' 
-          : 'As alterações foram salvas',
+        description:
+          mode === 'create' ? 'O contato foi adicionado com sucesso' : 'As alterações foram salvas',
       });
 
       if (onSuccess) {
@@ -95,9 +93,10 @@ export function ContactForm({
       } else {
         router.push('/dashboard/contacts');
       }
-      
+
       router.refresh();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Erro ao salvar contato:', error);
       toast({
         title: 'Erro',
@@ -122,16 +121,17 @@ export function ContactForm({
           {...register('name')}
           disabled={isSubmitting}
         />
-        {errors.name && (
-          <p className="text-sm text-destructive">{errors.name.message}</p>
-        )}
+        {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
       </div>
 
       {/* Email e Telefone - Lado a lado */}
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="email">
-            Email {mode === 'create' && <span className="text-muted-foreground text-xs">(email ou telefone obrigatório)</span>}
+            Email{' '}
+            {mode === 'create' && (
+              <span className="text-muted-foreground text-xs">(email ou telefone obrigatório)</span>
+            )}
           </Label>
           <Input
             id="email"
@@ -140,14 +140,15 @@ export function ContactForm({
             {...register('email')}
             disabled={isSubmitting}
           />
-          {errors.email && (
-            <p className="text-sm text-destructive">{errors.email.message}</p>
-          )}
+          {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="phone">
-            Telefone {mode === 'create' && <span className="text-muted-foreground text-xs">(email ou telefone obrigatório)</span>}
+            Telefone{' '}
+            {mode === 'create' && (
+              <span className="text-muted-foreground text-xs">(email ou telefone obrigatório)</span>
+            )}
           </Label>
           <Input
             id="phone"
@@ -155,9 +156,7 @@ export function ContactForm({
             {...register('phone')}
             disabled={isSubmitting}
           />
-          {errors.phone && (
-            <p className="text-sm text-destructive">{errors.phone.message}</p>
-          )}
+          {errors.phone && <p className="text-sm text-destructive">{errors.phone.message}</p>}
         </div>
       </div>
 
@@ -171,9 +170,7 @@ export function ContactForm({
             {...register('company')}
             disabled={isSubmitting}
           />
-          {errors.company && (
-            <p className="text-sm text-destructive">{errors.company.message}</p>
-          )}
+          {errors.company && <p className="text-sm text-destructive">{errors.company.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -184,9 +181,7 @@ export function ContactForm({
             {...register('position')}
             disabled={isSubmitting}
           />
-          {errors.position && (
-            <p className="text-sm text-destructive">{errors.position.message}</p>
-          )}
+          {errors.position && <p className="text-sm text-destructive">{errors.position.message}</p>}
         </div>
       </div>
 
@@ -199,9 +194,7 @@ export function ContactForm({
           placeholder="Adicionar tag (ex: cliente, lead, enterprise)"
           disabled={isSubmitting}
         />
-        {errors.tags && (
-          <p className="text-sm text-destructive">{errors.tags.message}</p>
-        )}
+        {errors.tags && <p className="text-sm text-destructive">{errors.tags.message}</p>}
       </div>
 
       {/* Notas */}
@@ -214,18 +207,12 @@ export function ContactForm({
           {...register('notes')}
           disabled={isSubmitting}
         />
-        {errors.notes && (
-          <p className="text-sm text-destructive">{errors.notes.message}</p>
-        )}
+        {errors.notes && <p className="text-sm text-destructive">{errors.notes.message}</p>}
       </div>
 
       {/* Botões */}
       <div className="flex gap-4">
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="flex-1"
-        >
+        <Button type="submit" disabled={isSubmitting} className="flex-1">
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {mode === 'create' ? 'Criar Contato' : 'Salvar Alterações'}
         </Button>
