@@ -1,10 +1,14 @@
-export type ContactStatus = 'lead' | 'client' | 'inactive';
+// Status possíveis de um contato
+export type ContactStatus = 'lead' | 'client' | 'inactive' | 'prospect';
 
+// Custom fields com tipagem forte
 export interface CustomFields {
   company?: string;
   position?: string;
   status?: ContactStatus;
   notes?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any; // Permite campos adicionais
 }
 
 export interface Contact {

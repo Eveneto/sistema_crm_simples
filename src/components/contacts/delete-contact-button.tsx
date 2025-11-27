@@ -16,7 +16,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 
 interface DeleteContactButtonProps {
   contactId: string;
@@ -51,10 +50,8 @@ export function DeleteContactButton({ contactId, contactName }: DeleteContactBut
       router.push('/dashboard/contacts');
       router.refresh();
     } catch (error) {
-      logger.error('Failed to delete contact', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        contactId,
-      });
+      // eslint-disable-next-line no-console
+      console.error('Erro ao excluir contato:', error);
       toast({
         title: 'Erro ao excluir',
         description:

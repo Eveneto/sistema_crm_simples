@@ -1,89 +1,73 @@
 /**
  * Sistema de Logging Estruturado
  *
- * Logger que só exibe em desenvolvimento e pode ser integrado
- * com serviços externos (Sentry, LogRocket, etc.) em produção.
+ * - Development: Console com cores e detalhes
+ * - Production: Apenas erros críticos (preparado para Sentry/LogRocket)
  */
 
-type LogLevel = 'error' | 'warn' | 'info' | 'debug';
-
 interface LogContext {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  [key: string]: unknown; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 class Logger {
   private isDevelopment = process.env.NODE_ENV === 'development';
-  private isTest = process.env.NODE_ENV === 'test';
 
   /**
-   * Log de erro crítico
+   * Log de debug (apenas em desenvolvimento)
    */
-  error(message: string, context?: LogContext): void {
-    if (this.isTest) return;
-
+  debug(message: string, context?: LogContext) {
     if (this.isDevelopment) {
       // eslint-disable-next-line no-console
-      console.error(`[ERROR] ${message}`, context || '');
+      console.log('🔍 [DEBUG]', message, context || '');
+    }
+  }
+
+  /**
+   * Log informativo (apenas em desenvolvimento)
+   */
+  info(message: string, context?: LogContext) {
+    if (this.isDevelopment) {
+      // eslint-disable-next-line no-console
+      console.info('ℹ️ [INFO]', message, context || '');
+    }
+  }
+
+  /**
+   * Log de aviso (apenas em desenvolvimento)
+   */
+  warn(message: string, context?: LogContext) {
+    if (this.isDevelopment) {
+      // eslint-disable-next-line no-console
+      console.warn('⚠️ [WARN]', message, context || '');
+    }
+  }
+
+  /**
+   * Log de erro (sempre registra, mas protege detalhes em produção)
+   */
+  error(message: string, context?: LogContext) {
+    if (this.isDevelopment) {
+      // eslint-disable-next-line no-console
+      console.error('❌ [ERROR]', message, context || '');
     } else {
-      // Em produção, enviar para serviço de monitoramento
-      this.sendToMonitoring('error', message, context);
-    }
-  }
-
-  /**
-   * Log de aviso
-   */
-  warn(message: string, context?: LogContext): void {
-    if (this.isTest) return;
-
-    if (this.isDevelopment) {
+      // Em produção: apenas mensagem sem detalhes sensíveis
       // eslint-disable-next-line no-console
-      console.warn(`[WARN] ${message}`, context || '');
-    } else {
-      this.sendToMonitoring('warn', message, context);
+      console.error('[ERROR]', message);
+
+      // TODO: Integrar com serviço de monitoramento
+      // Sentry.captureException(new Error(message), { extra: context });
+      // LogRocket.captureException(new Error(message), { extra: context });
     }
   }
 
   /**
-   * Log informativo
+   * Log de erro crítico (sempre registra)
    */
-  info(message: string, context?: LogContext): void {
-    if (this.isTest) return;
+  critical(message: string, context?: LogContext) {
+    // eslint-disable-next-line no-console
+    console.error('🚨 [CRITICAL]', message, context || '');
 
-    if (this.isDevelopment) {
-      // eslint-disable-next-line no-console
-      console.info(`[INFO] ${message}`, context || '');
-    } else {
-      this.sendToMonitoring('info', message, context);
-    }
-  }
-
-  /**
-   * Log de debug (apenas desenvolvimento)
-   */
-  debug(message: string, context?: LogContext): void {
-    if (this.isDevelopment) {
-      // eslint-disable-next-line no-console
-      console.debug(`[DEBUG] ${message}`, context || '');
-    }
-  }
-
-  /**
-   * Enviar logs para serviço de monitoramento em produção
-   * (Sentry, LogRocket, Datadog, etc.)
-   */
-  private sendToMonitoring(_level: LogLevel, _message: string, _context?: LogContext): void {
-    // TODO: Integrar com serviço de monitoramento
-    // Exemplo com Sentry:
-    // if (typeof window !== 'undefined' && window.Sentry) {
-    //   window.Sentry.captureMessage(_message, {
-    //     level: _level,
-    //     extra: _context,
-    //   });
-    // }
-    // Por enquanto, apenas armazena em memória (pode ser enviado em batch)
-    // Em produção real, você deve configurar Sentry ou similar
+    // TODO: Alertar equipe (Slack, PagerDuty, etc)
   }
 }
 

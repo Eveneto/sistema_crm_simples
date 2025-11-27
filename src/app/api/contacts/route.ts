@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
-import { CustomFields } from '@/types/contact';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,10 +56,7 @@ export async function GET(request: NextRequest) {
     const { data: contacts, error, count } = await query;
 
     if (error) {
-      logger.error('Failed to fetch contacts', {
-        error: error.message,
-        userId: user.id,
-      });
+      logger.error('Failed to fetch contacts', { error: error.message, userId: user.id });
       return NextResponse.json(
         { error: 'Erro ao buscar contatos', details: error.message },
         { status: 500 }
@@ -82,10 +78,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Unexpected error in contacts API', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      endpoint: 'GET /api/contacts',
-    });
+    logger.error('Unexpected error in contacts API', { error });
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
   }
 }
@@ -162,15 +155,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Preparar custom_fields
-    const customFields: CustomFields = {
-      status: 'lead',
-      ...(company && { company }),
-      ...(position && { position }),
-      ...(notes && { notes }),
-    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const customFields: Record<string, any> = { status: 'lead' };
+    if (company) customFields.company = company;
+    if (position) customFields.position = position;
+    if (notes) customFields.notes = notes;
 
     // Inserir contato
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: newContact, error: insertError } = await supabase
       .from('contacts')
       .insert({
@@ -185,10 +176,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
-      logger.error('Failed to create contact', {
-        error: insertError.message,
-        userId: user.id,
-      });
+      logger.error('Failed to create contact', { error: insertError.message, userId: user.id });
       return NextResponse.json(
         { error: 'Erro ao criar contato', details: insertError.message },
         { status: 500 }
@@ -203,10 +191,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    logger.error('Unexpected error creating contact', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      endpoint: 'POST /api/contacts',
-    });
+    logger.error('Unexpected error creating contact', { error });
 
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
   }

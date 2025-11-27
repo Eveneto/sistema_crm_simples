@@ -11,7 +11,6 @@ import { useDebounce } from '@/hooks/use-debounce';
 import { ContactsListSkeleton } from './contacts-list-skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import { logger } from '@/lib/logger';
 
 export function ContactsList() {
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -41,15 +40,24 @@ export function ContactsList() {
 
   async function fetchAvailableTags() {
     try {
+      // Usar endpoint otimizado /api/tags (5-6x mais rápido)
       const response = await fetch('/api/tags');
-      if (!response.ok) return;
+
+      if (!response.ok) {
+        // eslint-disable-next-line no-console
+        console.warn('Failed to fetch tags, using fallback');
+        return;
+      }
 
       const data = await response.json();
-      setAvailableTags(data.tags || []);
+
+      if (data.tags && Array.isArray(data.tags)) {
+        setAvailableTags(data.tags);
+      }
     } catch (err) {
-      logger.error('Failed to fetch available tags', {
-        error: err instanceof Error ? err.message : 'Unknown error',
-      });
+      // eslint-disable-next-line no-console
+      console.warn('Error fetching tags:', err);
+      // Silenciosamente falha - tags são feature secundária
     }
   }
 

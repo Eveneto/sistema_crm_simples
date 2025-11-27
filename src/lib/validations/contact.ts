@@ -30,7 +30,7 @@ export const contactSchema = z.object({
     .optional()
     .or(z.literal('')),
 
-  tags: z.array(z.string()).optional().default([]),
+  tags: z.array(z.string()).default([]),
 
   notes: z
     .string()
