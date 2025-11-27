@@ -1,18 +1,54 @@
--- Script de dados de teste para o CRM
--- Execute este script no SQL Editor do Supabase
+-- ============================================
+-- SCRIPT DE DADOS DE TESTE PARA PRODUÇÃO
+-- ============================================
+-- Execute este script no SQL Editor do Supabase (Dashboard)
+-- https://supabase.com/dashboard/project/YOUR_PROJECT/editor
+--
+-- ATENÇÃO: Este script irá popular dados de teste no banco de produção
+-- ============================================
+
+BEGIN;
 
 -- ============================================
--- ATENÇÃO: Este script popula dados de teste
+-- 0. CRIAR CONSTRAINTS E COLUNAS NECESSÁRIAS
 -- ============================================
 
--- Limpar dados existentes (descomente se necessário)
--- TRUNCATE TABLE activities CASCADE;
--- TRUNCATE TABLE deals CASCADE;
--- TRUNCATE TABLE conversations CASCADE;
--- TRUNCATE TABLE messages CASCADE;
--- TRUNCATE TABLE channels CASCADE;
--- TRUNCATE TABLE deal_stages CASCADE;
--- TRUNCATE TABLE contacts CASCADE;
+-- Email único em contacts (permite evitar duplicatas)
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'contacts_email_unique'
+  ) THEN
+    ALTER TABLE contacts ADD CONSTRAINT contacts_email_unique UNIQUE (email);
+  END IF;
+END $$;
+
+-- Uma conversa por contato+canal
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'conversations_contact_channel_unique'
+  ) THEN
+    ALTER TABLE conversations ADD CONSTRAINT conversations_contact_channel_unique UNIQUE (contact_id, channel_id);
+  END IF;
+END $$;
+
+-- Adicionar coluna closed_at em deals (se não existir)
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'deals' AND column_name = 'closed_at'
+  ) THEN
+    ALTER TABLE deals ADD COLUMN closed_at TIMESTAMP WITH TIME ZONE;
+    
+    -- Criar índice para performance
+    CREATE INDEX idx_deals_closed_at ON deals(closed_at) WHERE closed_at IS NOT NULL;
+    
+    -- Comentário explicativo
+    COMMENT ON COLUMN deals.closed_at IS 'Data e hora em que o deal foi marcado como ganho ou perdido';
+  END IF;
+END $$;
 
 -- ============================================
 -- 1. CRIAR CANAL PADRÃO (necessário para conversations)
@@ -127,11 +163,10 @@ ON CONFLICT (email) DO NOTHING;
 -- 4. INSERIR CONVERSAS
 -- ============================================
 
--- Nota: conversations requer channel_id. Usando o canal criado acima.
 INSERT INTO conversations (contact_id, channel_id, status, last_message_at, unread_count, created_at, updated_at)
 SELECT 
   c.id,
-  '00000000-0000-0000-0000-000000000001'::uuid, -- Canal WhatsApp criado acima
+  '00000000-0000-0000-0000-000000000001'::uuid,
   CASE 
     WHEN c.tags && ARRAY['cliente', 'ativo', 'prioritário'] THEN 'open'
     WHEN c.tags && ARRAY['lead'] THEN 'open'
@@ -149,7 +184,7 @@ WHERE c.tags && ARRAY['cliente', 'lead', 'ativo']
 ON CONFLICT (contact_id, channel_id) DO NOTHING;
 
 -- ============================================
--- 5. INSERIR NEGÓCIOS/DEALS
+-- 5. INSERIR NEGÓCIOS/DEALS PRINCIPAIS
 -- ============================================
 
 INSERT INTO deals (contact_id, title, value, stage_id, status, expected_close_date, closed_at, position, created_at, updated_at)
@@ -186,15 +221,10 @@ SELECT
     ELSE 50000.00
   END,
   CASE 
-    -- Ganhos vão para stage "Ganho"
     WHEN c.name IN ('Maria Santos', 'Lucas Barbosa', 'Pedro Oliveira') THEN '10000000-0000-0000-0000-000000000005'::uuid
-    -- Perdidos vão para stage "Perdido"
     WHEN c.name IN ('Juliana Ferreira', 'Roberto Lima', 'Gabriel Torres') THEN '10000000-0000-0000-0000-000000000006'::uuid
-    -- Em proposta
     WHEN c.name IN ('Ana Costa', 'Carlos Mendes') THEN '10000000-0000-0000-0000-000000000003'::uuid
-    -- Em qualificação
     WHEN c.name = 'João Silva' THEN '10000000-0000-0000-0000-000000000002'::uuid
-    -- Novos leads
     ELSE '10000000-0000-0000-0000-000000000001'::uuid
   END,
   CASE 
@@ -203,22 +233,18 @@ SELECT
     ELSE 'active'
   END,
   CASE 
-    -- Ganhos/Perdidos não têm data esperada
     WHEN c.name IN ('Maria Santos', 'Lucas Barbosa', 'Pedro Oliveira', 'Juliana Ferreira', 'Roberto Lima', 'Gabriel Torres') THEN NULL
     WHEN c.name IN ('Ana Costa', 'Carlos Mendes') THEN CURRENT_DATE + INTERVAL '15 days'
     WHEN c.name = 'João Silva' THEN CURRENT_DATE + INTERVAL '30 days'
     ELSE CURRENT_DATE + INTERVAL '45 days'
   END,
   CASE 
-    -- Ganhos: closed_at com datas variadas
     WHEN c.name = 'Maria Santos' THEN NOW() - INTERVAL '10 days'
     WHEN c.name = 'Lucas Barbosa' THEN NOW() - INTERVAL '5 days'
     WHEN c.name = 'Pedro Oliveira' THEN NOW() - INTERVAL '2 days'
-    -- Perdidos: closed_at mais antigas
     WHEN c.name = 'Juliana Ferreira' THEN NOW() - INTERVAL '40 days'
     WHEN c.name = 'Roberto Lima' THEN NOW() - INTERVAL '45 days'
     WHEN c.name = 'Gabriel Torres' THEN NOW() - INTERVAL '50 days'
-    -- Ativos: sem closed_at
     ELSE NULL
   END,
   ROW_NUMBER() OVER (PARTITION BY 
@@ -238,22 +264,26 @@ FROM contacts c;
 -- 6. INSERIR DEALS HISTÓRICOS (para o gráfico)
 -- ============================================
 
--- Inserir 30 deals ganhos distribuídos nos últimos 90 dias
 INSERT INTO deals (contact_id, title, value, stage_id, status, expected_close_date, closed_at, position, created_at, updated_at)
 SELECT 
   (SELECT id FROM contacts ORDER BY random() LIMIT 1),
   'Deal Histórico ' || generate_series,
   (random() * 100000 + 20000)::numeric(10,2),
-  '10000000-0000-0000-0000-000000000005'::uuid, -- Stage "Ganho"
+  '10000000-0000-0000-0000-000000000005'::uuid,
   'won',
   NULL,
-  NOW() - (generate_series || ' days')::interval, -- closed_at distribuído
+  NOW() - (generate_series || ' days')::interval,
   generate_series,
   NOW() - (generate_series || ' days')::interval - INTERVAL '5 days',
   NOW() - (generate_series || ' days')::interval
 FROM generate_series(1, 30);
 
--- Verificar dados inseridos
+COMMIT;
+
+-- ============================================
+-- VERIFICAÇÃO DOS DADOS INSERIDOS
+-- ============================================
+
 SELECT 'Contatos criados:' as tabela, COUNT(*) as total FROM contacts
 UNION ALL
 SELECT 'Conversas criadas:', COUNT(*) FROM conversations
@@ -264,14 +294,14 @@ SELECT 'Deals ganhos:', COUNT(*) FROM deals WHERE status = 'won'
 UNION ALL
 SELECT 'Deals perdidos:', COUNT(*) FROM deals WHERE status = 'lost'
 UNION ALL
-SELECT 'Deals abertos:', COUNT(*) FROM deals WHERE status = 'open';
+SELECT 'Deals ativos:', COUNT(*) FROM deals WHERE status = 'active';
 
 -- Resumo financeiro
 SELECT 
   'Valor total em negociação' as metrica,
   'R$ ' || TO_CHAR(SUM(value), 'FM999,999,999.00') as valor
 FROM deals 
-WHERE status = 'open'
+WHERE status = 'active'
 UNION ALL
 SELECT 
   'Valor total ganho',

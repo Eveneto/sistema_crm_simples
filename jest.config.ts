@@ -10,8 +10,18 @@ const config: Config = {
   // Ambiente de teste
   testEnvironment: 'jest-environment-jsdom',
 
+  // Globals para polyfills
+  globals: {
+    'ts-jest': {
+      tsconfig: {
+        jsx: 'react',
+      },
+    },
+  },
+
   // Setup files
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  setupFiles: ['<rootDir>/jest.polyfills.js'],
 
   // Padrões de teste
   testMatch: ['**/__tests__/**/*.test.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],

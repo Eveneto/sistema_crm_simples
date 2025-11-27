@@ -1,5 +1,24 @@
 import '@testing-library/jest-dom';
 
+// Polyfills para Next.js API Routes
+import { Request, Response, Headers, fetch } from 'undici';
+
+if (typeof global.Request === 'undefined') {
+  global.Request = Request as any;
+}
+
+if (typeof global.Response === 'undefined') {
+  global.Response = Response as any;
+}
+
+if (typeof global.Headers === 'undefined') {
+  global.Headers = Headers as any;
+}
+
+if (typeof global.fetch === 'undefined') {
+  global.fetch = fetch as any;
+}
+
 // Mock do window.matchMedia (necessário para testes com Radix UI)
 if (typeof window !== 'undefined') {
   Object.defineProperty(window, 'matchMedia', {
