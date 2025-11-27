@@ -302,100 +302,112 @@ Priorizado usando **MoSCoW** (Must have, Should have, Could have, Won't have):
 
 ---
 
-#### Sprint 3 (Semanas 5-6): WhatsApp - Parte 1
+#### Sprint 3 (Semanas 5-6): Automações e Relatórios
 
-**Objetivo:** Integração WhatsApp + Conversas básicas
+**Objetivo:** Workflows automáticos + Analytics avançados
 
 **User Stories:**
 
-- US-026: Listar conversas (5 pts)
-- US-027: Histórico de mensagens (5 pts)
-- US-028: Enviar mensagens (5 pts)
-- US-029: Receber mensagens (8 pts)
-- US-030: Notificações em tempo real (8 pts)
-- US-055: Listar canais (3 pts)
-- US-056: Conectar WhatsApp (8 pts)
+- US-026: Funil automatizado (5 pts)
+- US-027: Notificações em tempo real (3 pts)
+- US-028: Tarefas e lembretes (5 pts)
+- US-029: Relatório de conversão (3 pts)
+- US-030: Exportar dados (3 pts)
+- US-031: Dashboard analytics avançado (5 pts)
+- US-034: Refatoração do code review (5 pts)
 
-**Total:** 42 Story Points (Sprint mais pesada)
+**Total:** 29 Story Points
 
 **Tarefas Técnicas:**
 
-- [ ] Setup Evolution API
-- [ ] Implementar webhook
+- [ ] Criar tabelas de automações e notificações
 - [ ] Configurar Supabase Realtime
-- [ ] Desenvolver componente de chat
-- [ ] Testes de integração WhatsApp (manter 30%+ coverage)
+- [ ] Implementar Vercel Cron para jobs
+- [ ] Biblioteca xlsx para exportação
+- [ ] Testes de automação (manter 30%+ coverage)
 
 **Coverage Target Sprint 3:** 30-40% (adicionar E2E tests críticos)
 
 ---
 
-#### Sprint 4 (Semanas 7-8): WhatsApp - Parte 2 + Kanban
+#### Sprint 4 (Semanas 7-8): Kanban de Negócios (Pipeline Visual)
 
-**Objetivo:** Completar conversas + Pipeline de vendas
+**Objetivo:** Pipeline de vendas visual com drag-and-drop
 
 **User Stories:**
 
-- US-031: Status da conversa (2 pts)
-- US-032: Atribuir conversa (3 pts)
-- US-038: Kanban de negócios (13 pts)
-- US-039: Criar negócio (3 pts)
+- US-038: Visualizar Kanban de negócios (5 pts)
+- US-039: Criar novo negócio (3 pts)
 - US-040: Editar negócio (3 pts)
-- US-041: Drag-and-drop (8 pts)
-- US-042: Detalhes do negócio (3 pts)
+- US-041: Mover negócio entre estágios - drag-and-drop (8 pts)
+- US-042: Visualizar detalhes do negócio (3 pts)
+- US-043: Associar negócio a contato (3 pts)
+- US-044: Definir valor do negócio (2 pts)
+- US-045: Marcar como ganho/perdido (3 pts)
 
-**Total:** 35 Story Points
+**Total:** 30 Story Points
 
 **Tarefas Técnicas:**
 
-- [ ] Implementar @dnd-kit
+- [ ] Implementar @hello-pangea/dnd (drag-and-drop)
 - [ ] Criar store Zustand para Kanban
-- [ ] Desenvolver componentes de deal
-- [ ] Otimistic updates
-- [ ] Testes de drag-and-drop
+- [ ] Desenvolver componentes: PipelineBoard, DealCard, DealColumn
+- [ ] API `/api/deals` com CRUD completo
+- [ ] Optimistic updates para melhor UX
+- [ ] Testes de drag-and-drop (manter 35%+ coverage)
 
----
+**Coverage Target Sprint 4:** 35-45% (adicionar testes Playwright E2E)
 
-#### Sprint 5 (Semanas 9-10): Negócios + Atividades
+#### Sprint 5 (Semanas 9-10): WhatsApp - Integração e Conversas
 
-**Objetivo:** Completar CRM + Gestão de atividades
+**Objetivo:** Integrar WhatsApp + Conversas em tempo real
 
 **User Stories:**
 
-- US-043: Associar negócio a contato (3 pts)
-- US-044: Definir valor (2 pts)
-- US-045: Ganho/Perdido (3 pts)
-- US-049: Criar atividade (5 pts)
-- US-050: Listar atividades (3 pts)
-- US-051: Concluir atividade (2 pts)
-- US-052: Atribuir atividade (2 pts)
-- US-022: Tags em contatos (3 pts)
-- US-061: Perfil do usuário (3 pts)
-- US-062: Alterar senha (2 pts)
+- US-055: Listar canais conectados (3 pts)
+- US-056: Conectar número WhatsApp via QR Code (8 pts)
+- US-057: Desconectar canal (2 pts)
+- US-058: Status de conexão (2 pts)
+- US-059: Listar conversas WhatsApp (5 pts)
+- US-060: Visualizar histórico de mensagens (5 pts)
+- US-061: Enviar mensagens de texto (5 pts)
+- US-062: Receber mensagens (webhook) (8 pts)
 
-**Total:** 28 Story Points
+**Total:** 38 Story Points
+
+**Tarefas Técnicas:**
+
+- [ ] Setup Evolution API (ou Baileys)
+- [ ] Implementar webhook para receber mensagens
+- [ ] Configurar Supabase Realtime para chat
+- [ ] Desenvolver componentes de chat (ChatWindow, MessageList)
+- [ ] Testes de integração WhatsApp (manter 35%+ coverage)
 
 **Coverage Target Sprint 5:** 40-50% (consolidar cobertura crítica)
 
 ---
 
-#### Sprint 6 (Semanas 11-12): Polimento + Deploy
+#### Sprint 6 (Semanas 11-12): WhatsApp Avançado + Polimento + Deploy
 
-**Objetivo:** Refinamento + Deploy em produção
+**Objetivo:** Recursos avançados do WhatsApp + Refinamento + Deploy em produção
 
 **User Stories:**
 
-- US-015: Gráfico de funil (5 pts)
-- US-033: Enviar mídia (5 pts)
-- US-034: Mensagens rápidas (5 pts)
-- US-057: Desconectar canal (2 pts)
-- US-058: Status de conexão (2 pts)
-- US-063: Config da empresa (3 pts)
+- US-063: Notificações em tempo real de mensagens (5 pts)
+- US-064: Status da conversa (aberta/fechada) (2 pts)
+- US-065: Atribuir conversa a atendente (3 pts)
+- US-066: Enviar imagens/documentos (5 pts)
+- US-067: Mensagens rápidas (templates) (5 pts)
+- US-015: Gráfico de funil de vendas (5 pts)
+- US-068: Perfil do usuário (3 pts)
+- US-069: Alterar senha (2 pts)
 
-**Total:** 22 Story Points
+**Total:** 30 Story Points
 
 **Tarefas Técnicas:**
 
+- [ ] Implementar envio de mídia (WhatsApp)
+- [ ] Sistema de templates de mensagens
 - [ ] Performance optimization
 - [ ] Testes de carga
 - [ ] Segurança (penetration testing)
@@ -414,10 +426,10 @@ Cada Sprint entrega um **incremento potencialmente liberável**:
 | Sprint | Incremento                        | Valor Entregue                           | Coverage Target |
 | ------ | --------------------------------- | ---------------------------------------- | --------------- |
 | 1      | Sistema com autenticação + layout | Usuários podem fazer login e navegar     | 30% ✅          |
-| 2      | Dashboard + Contatos              | Visualizar métricas e gerenciar contatos | 30-35%          |
-| 3      | WhatsApp integrado                | Receber e enviar mensagens               | 30-40%          |
-| 4      | Pipeline de vendas                | Gerenciar negócios visualmente           | 35-45%          |
-| 5      | CRM completo                      | Atividades e workflow completo           | 40-50%          |
+| 2      | Dashboard + Contatos              | Visualizar métricas e gerenciar contatos | 30-35% ✅       |
+| 3      | Automações e Relatórios           | Workflows automáticos e analytics        | 30-40%          |
+| 4      | Pipeline de vendas (Kanban)       | Gerenciar negócios visualmente           | 35-45%          |
+| 5      | WhatsApp integrado                | Receber e enviar mensagens               | 40-50%          |
 | 6      | Produto final                     | Sistema pronto para produção             | 50%+            |
 
 ---
