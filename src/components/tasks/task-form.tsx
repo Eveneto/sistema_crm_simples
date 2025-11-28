@@ -33,6 +33,23 @@ export function TaskForm({ task, dealId, contactId, onSuccess, onCancel }: TaskF
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Converter ISO datetime para formato datetime-local (YYYY-MM-DDTHH:mm)
+  const formatDatetimeLocal = (isoString: string | null | undefined): string => {
+    if (!isoString) return '';
+    try {
+      const date = new Date(isoString);
+      // Formato: YYYY-MM-DDTHH:mm
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    } catch {
+      return '';
+    }
+  };
+
   const {
     register,
     handleSubmit,
@@ -49,8 +66,8 @@ export function TaskForm({ task, dealId, contactId, onSuccess, onCancel }: TaskF
           priority: task.priority,
           deal_id: task.deal_id || dealId,
           contact_id: task.contact_id || contactId,
-          due_date: task.due_date || '',
-          reminder_at: task.reminder_at || '',
+          due_date: formatDatetimeLocal(task.due_date),
+          reminder_at: formatDatetimeLocal(task.reminder_at),
         }
       : {
           status: 'pending',
@@ -65,13 +82,20 @@ export function TaskForm({ task, dealId, contactId, onSuccess, onCancel }: TaskF
       setIsSubmitting(true);
       setError(null);
 
+      // Converter datetime-local para ISO com timezone
+      const payload = {
+        ...data,
+        due_date: data.due_date ? new Date(data.due_date).toISOString() : undefined,
+        reminder_at: data.reminder_at ? new Date(data.reminder_at).toISOString() : undefined,
+      };
+
       const url = task ? `/api/tasks/${task.id}` : '/api/tasks';
       const method = task ? 'PATCH' : 'POST';
 
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
