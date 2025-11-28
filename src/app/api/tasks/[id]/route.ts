@@ -33,9 +33,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
     // Buscar task (RLS garante que usuário só vê suas próprias tasks)
     const { data: task, error } = await supabase
       .from('tasks')
-      .select(
-        '*, deals(id, title, value, stage), contacts(id, name, email, phone), assigned_user:auth.users!assigned_to(id, email)'
-      )
+      .select('*, deals(id, title, value, stage), contacts(id, name, email, phone)')
       .eq('id', id)
       .single();
 
@@ -89,7 +87,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       .from('tasks')
       .update(updateData as any)
       .eq('id', id)
-      .select('*, deals(title), contacts(name), assigned_user:auth.users!assigned_to(id, email)')
+      .select('*, deals(title), contacts(name)')
       .single()) as any;
 
     if (error) {
