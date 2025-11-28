@@ -53,9 +53,9 @@ export const createTaskSchema = z.object({
   contact_id: z.string().uuid().optional(),
   status: taskStatusSchema.default('pending'),
   priority: taskPrioritySchema.default('medium'),
-  due_date: z.string().datetime().optional(),
+  due_date: z.string().optional().nullable(),
   assigned_to: z.string().uuid().optional(),
-  reminder_at: z.string().datetime().optional(),
+  reminder_at: z.string().optional().nullable(),
 });
 
 export const updateTaskSchema = createTaskSchema.partial();
