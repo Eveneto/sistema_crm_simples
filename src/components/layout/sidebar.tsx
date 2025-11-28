@@ -16,6 +16,7 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  Zap,
 } from 'lucide-react';
 import { useUserRole } from '@/hooks/use-user-role';
 
@@ -51,6 +52,11 @@ const navItems: NavItem[] = [
     title: 'Atividades',
     href: '/dashboard/activities',
     icon: Calendar,
+  },
+  {
+    title: 'Automações',
+    href: '/dashboard/automations',
+    icon: Zap,
   },
   {
     title: 'Relatórios',
