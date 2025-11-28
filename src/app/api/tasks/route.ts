@@ -138,10 +138,16 @@ export async function POST(request: NextRequest) {
 
     const taskData = validationResult.data;
 
+    // Adicionar user_id do usuário autenticado
+    const taskPayload = {
+      ...taskData,
+      user_id: user.id,
+    };
+
     // Inserir task
     const { data: task, error } = (await supabase
       .from('tasks')
-      .insert([taskData as any])
+      .insert([taskPayload as any])
       .select('*, deals(title), contacts(name)')
       .single()) as any;
 
