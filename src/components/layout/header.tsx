@@ -13,9 +13,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { NotificationBell } from '@/components/notifications/notification-bell';
 import { useUserRole } from '@/hooks/use-user-role';
 import { LogOut, User, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export function Header() {
   const router = useRouter();
@@ -44,9 +46,7 @@ export function Header() {
       router.push('/login');
       router.refresh();
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Logout error:', error);
-      }
+      logger.error('Logout error', { error });
       toast({
         variant: 'destructive',
         title: 'Erro inesperado',
@@ -73,6 +73,7 @@ export function Header() {
 
       {/* Actions */}
       <div className="flex items-center space-x-2">
+        <NotificationBell />
         <ThemeToggle />
 
         <DropdownMenu>

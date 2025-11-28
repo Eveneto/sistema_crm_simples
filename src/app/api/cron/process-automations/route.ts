@@ -286,10 +286,26 @@ async function executeAction(
       break;
 
     case 'send_notification':
-      // Será implementado quando tivermos a tabela de notificações (US-027)
-      logger.debug('Notification action skipped (not yet implemented)', {
-        dealId: deal.id,
-      });
+      // Criar notificação para o usuário
+      if (action.notification_message) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase.from('notifications') as any).insert([
+          {
+            user_id: _userId,
+            title: 'Automação Executada',
+            message: action.notification_message,
+            type: 'automation_executed',
+            entity_type: 'deal',
+            entity_id: deal.id,
+            link: `/dashboard/deals/${deal.id}`,
+          },
+        ]);
+
+        logger.info('Notification created', {
+          dealId: deal.id,
+          userId: _userId,
+        });
+      }
       break;
 
     case 'create_task':
