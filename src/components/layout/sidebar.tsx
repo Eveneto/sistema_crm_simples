@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
+  CheckSquare,
 } from 'lucide-react';
 import { useUserRole } from '@/hooks/use-user-role';
 
@@ -47,6 +48,11 @@ const navItems: NavItem[] = [
     title: 'Negócios',
     href: '/dashboard/deals',
     icon: FolderKanban,
+  },
+  {
+    title: 'Tarefas',
+    href: '/dashboard/tasks',
+    icon: CheckSquare,
   },
   {
     title: 'Atividades',

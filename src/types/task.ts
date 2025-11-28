@@ -67,9 +67,16 @@ export const taskFilterSchema = z.object({
   deal_id: z.string().uuid().optional(),
   contact_id: z.string().uuid().optional(),
   overdue: z.boolean().optional(),
+  due_today: z.boolean().optional(),
+  search: z.string().optional(),
   limit: z.number().int().min(1).max(100).default(20),
   offset: z.number().int().min(0).default(0),
 });
+
+// Inferred types from schemas
+export type CreateTaskPayload = z.infer<typeof createTaskSchema> & { user_id: string };
+export type UpdateTaskPayload = z.infer<typeof updateTaskSchema>;
+export type TaskFilters = z.infer<typeof taskFilterSchema>;
 
 // ============================================
 // Response Types
@@ -192,4 +199,16 @@ export function getTaskStatusLabel(status: TaskStatus): string {
 
 export function getTaskPriorityLabel(priority: TaskPriority): string {
   return TASK_PRIORITY_LABELS[priority];
+}
+
+export function getStatusColor(status: TaskStatus): string {
+  return TASK_STATUS_COLORS[status];
+}
+
+export function getPriorityColor(priority: TaskPriority): string {
+  return TASK_PRIORITY_COLORS[priority];
+}
+
+export function isOverdue(task: Task): boolean {
+  return isOverdueTask(task);
 }

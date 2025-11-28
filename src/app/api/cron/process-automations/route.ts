@@ -309,10 +309,61 @@ async function executeAction(
       break;
 
     case 'create_task':
-      // Será implementado quando tivermos a tabela de tasks (US-028)
-      logger.debug('Task creation skipped (not yet implemented)', {
-        dealId: deal.id,
-      });
+      // Criar tarefa vinculada ao deal
+      if (action.task_title) {
+        try {
+          /* eslint-disable @typescript-eslint/no-explicit-any */
+          const { data: task, error: taskError } = (await supabase
+            .from('tasks')
+            .insert([
+              {
+                user_id: _userId,
+                title: action.task_title,
+                description: action.task_description || null,
+                deal_id: deal.id,
+                status: 'pending',
+                priority: action.task_priority || 'medium',
+                due_date: action.task_due_date || null,
+              },
+            ])
+            .select()
+            .single()) as any;
+          /* eslint-enable @typescript-eslint/no-explicit-any */
+
+          if (taskError) {
+            logger.error('Error creating task:', { taskError, dealId: deal.id });
+          } else {
+            logger.info('Task created from automation', {
+              dealId: deal.id,
+              taskId: task.id,
+              title: action.task_title,
+            });
+
+            // Criar notificação sobre a nova tarefa
+            try {
+              /* eslint-disable @typescript-eslint/no-explicit-any */
+              await (supabase.rpc as any)('create_notification', {
+                p_user_id: _userId,
+                p_title: 'Nova Tarefa Criada',
+                p_message: `Tarefa criada pela automação: ${action.task_title}`,
+                p_type: 'task_assigned',
+                p_entity_type: 'task',
+                p_entity_id: task.id,
+                p_link: `/dashboard/tasks/${task.id}`,
+              });
+              /* eslint-enable @typescript-eslint/no-explicit-any */
+            } catch (notifError) {
+              logger.error('Error creating notification for task:', { notifError });
+            }
+          }
+        } catch (error) {
+          logger.error('Unexpected error creating task:', { error, dealId: deal.id });
+        }
+      } else {
+        logger.debug('Task creation skipped (no task title provided)', {
+          dealId: deal.id,
+        });
+      }
       break;
 
     case 'add_tag':
