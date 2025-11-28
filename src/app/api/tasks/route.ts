@@ -27,8 +27,8 @@ export async function GET(request: NextRequest) {
     // Parse query parameters
     const searchParams = request.nextUrl.searchParams;
     const filters: TaskFilters = {
-      status: searchParams.get('status') || undefined,
-      priority: searchParams.get('priority') || undefined,
+      status: (searchParams.get('status') as any) || undefined,
+      priority: (searchParams.get('priority') as any) || undefined,
       deal_id: searchParams.get('deal_id') || undefined,
       contact_id: searchParams.get('contact_id') || undefined,
       assigned_to: searchParams.get('assigned_to') || undefined,
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     // Build query
     let query = supabase
       .from('tasks')
-      .select('*, deals(title), contacts(name), assigned_user:auth.users!assigned_to(id, email)', {
+      .select('*, deals(title), contacts(name)', {
         count: 'exact',
       })
       .or(`user_id.eq.${user.id},assigned_to.eq.${user.id}`);
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
     const { data: task, error } = (await supabase
       .from('tasks')
       .insert([taskData as any])
-      .select('*, deals(title), contacts(name), assigned_user:auth.users!assigned_to(id, email)')
+      .select('*, deals(title), contacts(name)')
       .single()) as any;
 
     if (error) {
