@@ -1,7 +1,7 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { Task } from '@/types/task';
 import { TaskForm } from '@/components/tasks/task-form';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -22,8 +22,9 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-export default function EditTaskPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function EditTaskPage() {
+  const params = useParams();
+  const id = params?.id as string;
   const router = useRouter();
   const [task, setTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
