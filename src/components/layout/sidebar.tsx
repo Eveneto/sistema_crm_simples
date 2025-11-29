@@ -46,7 +46,7 @@ const navItems: NavItem[] = [
   },
   {
     title: 'Negócios',
-    href: '/dashboard/deals',
+    href: '/dashboard/deals/pipeline',
     icon: FolderKanban,
   },
   {
