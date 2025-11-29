@@ -1,10 +1,12 @@
 # 🚀 Sprint 4 - Kickoff
 
 **Data de Início:** 29/11/2024  
+**Data Atual:** 29/11/2024  
 **Branch:** `sprint-4/pipeline-vendas-kanban`  
-**Duração:** 2 semanas (12/12 - 25/12)  
-**Story Points:** 30 pts  
-**Status:** ✅ **INICIADA**
+**Duração:** 2 semanas (29/11 - 25/12)  
+**Story Points:** 30 pts (5 completos / 25 pendentes)  
+**Status:** 🟢 **EM ANDAMENTO** (16.7% completo)  
+**Velocidade:** 5 pts/dia (meta: 2.5 pts/dia) 🚀
 
 ---
 
@@ -30,21 +32,21 @@ Implementar **Pipeline Visual de Vendas** (Kanban drag-and-drop) com otimizaçõ
 
 ### Epic 1: Pipeline de Vendas (22 pts)
 
-| ID | Story | Pontos | Prioridade |
-|----|-------|--------|------------|
-| US-038 | Visualizar Kanban de Negócios | 5 | 🔴 Crítica |
-| US-039 | Criar Novo Negócio | 3 | 🔴 Crítica |
-| US-040 | Editar Negócio | 3 | 🟡 Alta |
-| US-041 | Drag and Drop entre Estágios | 8 | 🔴 Crítica |
-| US-042 | Visualizar Detalhes do Negócio | 3 | 🟡 Alta |
+| ID | Story | Pontos | Status | Prioridade |
+|----|-------|--------|--------|------------|
+| US-038 | Visualizar Kanban de Negócios | 5 | ✅ **COMPLETO** | 🔴 Crítica |
+| US-039 | Criar Novo Negócio | 3 | ⏳ **PRÓXIMA** | 🔴 Crítica |
+| US-040 | Editar Negócio | 3 | ⬜ Pendente | 🟡 Alta |
+| US-041 | Drag and Drop entre Estágios | 8 | ⬜ Pendente | 🔴 Crítica |
+| US-042 | Visualizar Detalhes do Negócio | 3 | ⬜ Pendente | 🟡 Alta |
 
 ### Epic 2: Performance Crítica (8 pts)
 
-| ID | Story | Pontos | Prioridade |
-|----|-------|--------|------------|
-| US-043 | Code Splitting Essencial | 3 | 🟡 Alta |
-| US-044 | Database Indexes | 3 | 🟡 Alta |
-| US-045 | Monitoramento Básico | 2 | 🟢 Média |
+| ID | Story | Pontos | Status | Prioridade |
+|----|-------|--------|--------|------------|
+| US-043 | Code Splitting Essencial | 3 | ⬜ Pendente | 🟡 Alta |
+| US-044 | Database Indexes | 3 | ⬜ Pendente | 🟡 Alta |
+| US-045 | Monitoramento Básico | 2 | ⬜ Pendente | 🟢 Média |
 
 ---
 
