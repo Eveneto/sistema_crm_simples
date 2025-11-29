@@ -3,79 +3,104 @@
  * Página principal do Kanban de vendas
  */
 
-import { Suspense } from 'react';
-import { createClient } from '@/lib/supabase/server';
+'use client';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 import { PipelineBoard } from '@/components/deals/pipeline-board';
 import { PipelineSkeleton } from '@/components/deals/pipeline-skeleton';
+import { DealForm } from '@/components/deals/deal-form';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PlusCircle } from 'lucide-react';
-import { redirect } from 'next/navigation';
 import type { PipelineStage } from '@/types/deal';
 
-export const metadata = {
-  title: 'Pipeline de Vendas | CRM',
-  description: 'Visualize e gerencie seus negócios em um pipeline visual',
-};
+export default function PipelinePage() {
+  const [stages, setStages] = useState<PipelineStage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const router = useRouter();
 
-async function getPipelineData(): Promise<PipelineStage[]> {
-  const supabase = await createClient();
+  useEffect(() => {
+    fetchPipelineData();
+  }, []);
 
-  // Verificar autenticação
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  async function fetchPipelineData() {
+    try {
+      const supabase = createClient();
 
-  if (!user) {
-    redirect('/login');
+      // Verificar autenticação
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+
+      // Buscar stages
+      const { data: stages, error: stagesError } = await supabase
+        .from('pipeline_stages')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_position', { ascending: true });
+
+      if (stagesError) {
+        console.error('Error fetching stages:', stagesError);
+        return;
+      }
+
+      // Buscar deals
+      const { data: deals, error: dealsError } = await supabase
+        .from('deals')
+        .select(`
+          *,
+          contact:contacts(id, name, email),
+          stage:pipeline_stages(id, name, color, order_position)
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .order('position', { ascending: true })
+        .limit(100);
+
+      if (dealsError) {
+        console.error('Error fetching deals:', dealsError);
+        return;
+      }
+
+      // Agrupar deals por stage
+      const pipelineData: PipelineStage[] = (stages as any[]).map((stage: any) => {
+        const stageDeals = (deals as any[]).filter((deal: any) => deal.stage_id === stage.id);
+        const totalValue = stageDeals.reduce((sum: number, deal: any) => sum + (deal.value || 0), 0);
+
+        return {
+          ...stage,
+          deals: stageDeals,
+          count: stageDeals.length,
+          totalValue,
+        };
+      });
+
+      setStages(pipelineData);
+    } catch (error) {
+      console.error('Error fetching pipeline data:', error);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  // Buscar stages
-  const { data: stages, error: stagesError } = await supabase
-    .from('stages')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('order', { ascending: true });
+  const handleSuccess = () => {
+    setIsCreateModalOpen(false);
+    fetchPipelineData(); // Recarregar dados
+  };
 
-  if (stagesError) {
-    console.error('Error fetching stages:', stagesError);
-    return [];
-  }
-
-  // Buscar deals
-  const { data: deals, error: dealsError } = await supabase
-    .from('deals')
-    .select(`
-      *,
-      contact:contacts(id, name, email),
-      stage:stages(id, name, color, "order")
-    `)
-    .eq('user_id', user.id)
-    .order('position', { ascending: true })
-    .limit(100);
-
-  if (dealsError) {
-    console.error('Error fetching deals:', dealsError);
-    return [];
-  }
-
-  // Agrupar deals por stage
-  const pipelineData: PipelineStage[] = (stages as any[]).map((stage: any) => {
-    const stageDeals = (deals as any[]).filter((deal: any) => deal.stage_id === stage.id);
-    const totalValue = stageDeals.reduce((sum: number, deal: any) => sum + (deal.value || 0), 0);
-
-    return {
-      ...stage,
-      deals: stageDeals,
-      count: stageDeals.length,
-      totalValue,
-    };
-  });
-
-  return pipelineData;
-}
-
-export default async function PipelinePage() {
-  const stages = await getPipelineData();
+  const handleCancel = () => {
+    setIsCreateModalOpen(false);
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -88,16 +113,33 @@ export default async function PipelinePage() {
           </p>
         </div>
 
-        <Button>
+        <Button onClick={() => setIsCreateModalOpen(true)}>
           <PlusCircle className="w-4 h-4 mr-2" />
           Novo Negócio
         </Button>
       </div>
 
       {/* Pipeline Board */}
-      <Suspense fallback={<PipelineSkeleton />}>
+      {loading ? (
+        <PipelineSkeleton />
+      ) : (
         <PipelineBoard stages={stages} />
-      </Suspense>
+      )}
+
+      {/* Modal Criar Negócio */}
+      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Criar Novo Negócio</DialogTitle>
+          </DialogHeader>
+          <DealForm
+            mode="create"
+            stages={stages}
+            onSuccess={handleSuccess}
+            onCancel={handleCancel}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

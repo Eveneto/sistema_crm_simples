@@ -19,7 +19,7 @@ export default function ReportsPage() {
       href: '/dashboard/reports/export',
       icon: Download,
       color: 'text-green-600',
-      available: false, // Será implementado em US-030
+      available: true,
     },
     {
       title: 'Analytics Avançado',
@@ -43,7 +43,7 @@ export default function ReportsPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {reports.map((report) => {
           const Icon = report.icon;
-
+          
           return (
             <Card key={report.href} className="hover:shadow-lg transition-shadow">
               <CardHeader>
@@ -60,8 +60,10 @@ export default function ReportsPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <CardDescription className="mb-4">{report.description}</CardDescription>
-
+                <CardDescription className="mb-4">
+                  {report.description}
+                </CardDescription>
+                
                 {report.available ? (
                   <Link href={report.href}>
                     <Button className="w-full" variant="default">
@@ -88,19 +90,19 @@ export default function ReportsPage() {
           <div>
             <h3 className="font-semibold mb-2">✅ Disponível: Relatório de Conversão</h3>
             <p className="text-sm text-muted-foreground">
-              Visualize o funil de vendas completo com métricas de conversão entre estágios, tempo
-              médio em cada fase e análise de performance do pipeline.
+              Visualize o funil de vendas completo com métricas de conversão entre estágios,
+              tempo médio em cada fase e análise de performance do pipeline.
             </p>
           </div>
-
+          
           <div>
-            <h3 className="font-semibold mb-2">🚧 Em desenvolvimento: Exportar Dados</h3>
+            <h3 className="font-semibold mb-2">✅ Disponível: Exportar Dados</h3>
             <p className="text-sm text-muted-foreground">
-              Exporte seus dados (contatos, negócios, tarefas) em formato CSV para análise externa
-              ou backup.
+              Exporte seus dados (contatos, negócios, tarefas) em formato CSV para análise
+              externa ou backup. Download instantâneo com todos os campos formatados.
             </p>
           </div>
-
+          
           <div>
             <h3 className="font-semibold mb-2">🚧 Em desenvolvimento: Analytics Avançado</h3>
             <p className="text-sm text-muted-foreground">
