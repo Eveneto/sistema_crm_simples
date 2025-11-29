@@ -102,20 +102,22 @@ src/
 
 ### Semana 1: Core Features (12-16/12)
 
-**Dia 1 (12/12) - Terça**
-- [ ] Setup @hello-pangea/dnd
-- [ ] Estrutura de pastas e arquivos
-- [ ] US-038: Visualizar Kanban (parte 1)
-  - [ ] Criar página /dashboard/deals/pipeline
-  - [ ] Componentes: PipelineBoard, PipelineColumn, DealCard
-  - [ ] API GET /api/deals (básico)
+**Dia 1 (29/11) - Sexta** ✅ **COMPLETO**
+- [x] Setup @hello-pangea/dnd
+- [x] Estrutura de pastas e arquivos
+- [x] US-038: Visualizar Kanban (100% - 5pts)
+  - [x] Criar página /dashboard/deals/pipeline
+  - [x] Componentes: PipelineBoard, PipelineColumn, DealCard
+  - [x] API GET /api/deals (lista + pipeline view)
+  - [x] API POST /api/deals (criar)
+  - [x] Skeleton loaders (PipelineSkeleton)
+  - [x] Empty states melhorados
+  - [x] Responsividade mobile-first
+  - [x] Hover states e transições
+  - [x] Acessibilidade (ARIA)
+  - [x] 13 testes (100% passando)
 
-**Dia 2 (13/12) - Quarta**
-- [ ] US-038: Visualizar Kanban (parte 2)
-  - [ ] Estatísticas por coluna (count + total)
-  - [ ] Skeleton loaders
-  - [ ] Responsivo básico
-- [ ] Testes: PipelineBoard, DealCard (3 testes)
+**Próximo: US-039 - Criar Negócio (3 pts)**
 
 **Dia 3 (14/12) - Quinta**
 - [ ] US-039: Criar Negócio
