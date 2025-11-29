@@ -6,6 +6,7 @@
 import { Suspense } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { PipelineBoard } from '@/components/deals/pipeline-board';
+import { PipelineSkeleton } from '@/components/deals/pipeline-skeleton';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { redirect } from 'next/navigation';
@@ -71,18 +72,6 @@ async function getPipelineData(): Promise<PipelineStage[]> {
   });
 
   return pipelineData;
-}
-
-function PipelineSkeleton() {
-  return (
-    <div className="flex gap-4 p-6">
-      {[1, 2, 3, 4].map(i => (
-        <div key={i} className="w-80 flex-shrink-0">
-          <div className="h-32 bg-muted animate-pulse rounded-lg" />
-        </div>
-      ))}
-    </div>
-  );
 }
 
 export default async function PipelinePage() {

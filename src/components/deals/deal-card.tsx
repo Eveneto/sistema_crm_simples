@@ -28,43 +28,51 @@ export function DealCard({ deal, isDragging = false }: DealCardProps) {
     lost: 'bg-red-500',
   }[deal.status];
 
+  const statusLabel = {
+    active: 'Ativo',
+    won: 'Ganho',
+    lost: 'Perdido',
+  }[deal.status];
+
   return (
     <Card 
       className={`
         cursor-grab active:cursor-grabbing
-        hover:shadow-md transition-shadow
-        ${isDragging ? 'opacity-50 shadow-lg' : ''}
+        hover:shadow-lg hover:scale-[1.02] hover:border-primary/50
+        transition-all duration-200 ease-out
+        ${isDragging ? 'opacity-50 shadow-2xl scale-105 rotate-2' : ''}
       `}
+      role="article"
+      aria-label={`Negócio: ${deal.title}`}
     >
       <CardContent className="p-4 space-y-2">
         {/* Título */}
-        <h3 className="font-semibold text-sm line-clamp-2">
+        <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">
           {deal.title}
         </h3>
 
         {/* Valor */}
         {deal.value && deal.value > 0 && (
-          <p className="text-lg font-bold text-green-600">
+          <p className="text-lg font-bold text-green-600 transition-transform hover:scale-105">
             {formatCurrency(deal.value)}
           </p>
         )}
 
         {/* Contato */}
         {deal.contact && (
-          <p className="text-xs text-muted-foreground truncate">
-            👤 {deal.contact.name}
+          <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
+            <span aria-hidden="true">👤</span>
+            <span>{deal.contact.name}</span>
           </p>
         )}
 
         {/* Status Badge */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 pt-1">
           <Badge 
             variant="secondary" 
-            className={`${statusColor} text-white text-xs`}
+            className={`${statusColor} text-white text-xs transition-transform hover:scale-110`}
           >
-            {deal.status === 'active' && 'Ativo'}
-            {deal.status === 'won' && 'Ganho'}
-            {deal.status === 'lost' && 'Perdido'}
+            {statusLabel}
           </Badge>
           
           {/* Data de criação */}
