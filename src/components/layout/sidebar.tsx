@@ -65,6 +65,11 @@ const navItems: NavItem[] = [
     icon: Zap,
   },
   {
+    title: 'Analytics',
+    href: '/dashboard/analytics',
+    icon: BarChart3,
+  },
+  {
     title: 'Relatórios',
     href: '/dashboard/reports',
     icon: BarChart3,

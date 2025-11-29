@@ -3,19 +3,21 @@
 **Data de Início:** 28/11/2024  
 **Data de Conclusão:** 28/11/2024  
 **Duração Real:** 1 dia (planejado: 2 semanas)  
-**Meta:** 19 pontos  
-**Alcançado:** 19 pontos (100%) ✅
+**Meta Original:** 24 pontos (6 User Stories)  
+**Alcançado:** 19 pontos (5 User Stories - 79%) ✅  
+**Pendente:** 5 pontos (1 User Story - US-031)
 
 ---
 
 ## 🎯 Resumo Executivo
 
-A Sprint 3 foi **100% concluída** com todas as 5 User Stories implementadas, testadas e commitadas no repositório. O foco foi em automações, relatórios e funcionalidades avançadas do CRM.
+A Sprint 3 teve **79% de conclusão** (19/24 pontos) com 5 User Stories implementadas, testadas e commitadas. O foco foi em automações, relatórios e funcionalidades avançadas do CRM.
 
 ### Destaques
 
 - ✅ **5 User Stories completas** (US-026 a US-030)
-- ✅ **19 pontos de story entregues** (100% da meta)
+- ✅ **19 pontos de story entregues** (79% da meta)
+- ⏳ **1 User Story pendente** (US-031 - 5 pts)
 - ✅ **0 bugs críticos** pendentes
 - ✅ **Todos os commits no GitHub** com CI/CD passando
 - ⚠️ **1 bug conhecido** (Query Supabase auth.users) - documentado em issue
@@ -364,9 +366,10 @@ A Sprint 3 foi **100% concluída** com todas as 5 User Stories implementadas, te
 
 | Métrica                     | Valor      |
 | --------------------------- | ---------- |
-| **Story Points Planejados** | 19 pts     |
-| **Story Points Entregues**  | 19 pts     |
-| **Taxa de Conclusão**       | 100%       |
+| **Story Points Planejados** | 24 pts (6 US) |
+| **Story Points Entregues**  | 19 pts (5 US) |
+| **Story Points Pendentes**  | 5 pts (1 US) |
+| **Taxa de Conclusão**       | 79%       |
 | **Duração Real**            | 1 dia      |
 | **Duração Planejada**       | 14 dias    |
 | **Velocidade**              | 19 pts/dia |
@@ -473,48 +476,54 @@ A Sprint 3 foi **100% concluída** com todas as 5 User Stories implementadas, te
 
 ## 📈 Comparação com Sprints Anteriores
 
-| Sprint       | Story Points | Taxa Conclusão | Bugs  | Duração   |
-| ------------ | ------------ | -------------- | ----- | --------- |
-| Sprint 1     | 15 pts       | 100%           | 2     | 3 dias    |
-| Sprint 2     | 18 pts       | 100%           | 3     | 2 dias    |
-| **Sprint 3** | **19 pts**   | **100%**       | **4** | **1 dia** |
+| Sprint       | Story Points | US Completas | Taxa Conclusão | Bugs  | Duração   |
+| ------------ | ------------ | ------------ | -------------- | ----- | --------- |
+| Sprint 1     | 15 pts       | 4/4          | 100%           | 2     | 3 dias    |
+| Sprint 2     | 18 pts       | 5/5          | 100%           | 3     | 2 dias    |
+| **Sprint 3** | **19/24 pts**| **5/6 US**   | **79%**        | **4** | **1 dia** |
 
 ### Tendências
 
-- ✅ **Velocidade aumentando:** 15 → 18 → 19 pts
+- ✅ **Velocidade aumentando:** 15 → 18 → 19 pts entregues
 - ✅ **Eficiência melhorando:** 3d → 2d → 1d
 - ⚠️ **Bugs estáveis:** 2 → 3 → 4 (todos corrigidos)
-- ✅ **Qualidade mantida:** 100% conclusão
+- 📊 **Escopo ampliando:** 4 → 5 → 6 US planejadas
+- ⏳ **Taxa conclusão:** 100% → 100% → 79% (1 US pendente)
 
 ---
 
 ## 🚀 Próximos Passos
 
-### Imediato (Sprint 3.1 - Correções)
+### Imediato (Sprint 3.1 - Correções e US-031)
 
 1. ⏳ Investigar bug de cache Supabase auth.users
 2. ⏳ Testar todas as funcionalidades em staging
 3. ⏳ Validar exportações com dados reais
 4. ⏳ Performance test em relatórios
+5. ⏳ **US-031: Dashboard Analytics Avançado (5 pts)** - Ver detalhamento acima
 
-### Curto Prazo (Sprint 4)
+### Curto Prazo (Sprint 4 - Otimização)
 
-Ver documento: `SPRINT_4_OTIMIZACAO.md`
+Ver documento: `SPRINT_4_OTIMIZACAO.md` (13 pontos)
 
 Foco em:
 
-- Performance e otimização
-- Caching strategies
-- Code splitting
-- Image optimization
-- Database indexing
+- Performance e otimização de carregamento
+- Caching strategies (React Query)
+- Code splitting e lazy loading
+- Image optimization (Next.js Image)
+- Database indexing e query optimization
+- Web Vitals tracking e monitoramento
 
-### Médio Prazo (Sprint 5)
+### Médio Prazo (Sprint 5 - Integrações)
 
-1. US-032: Integração com Email (8 pts)
-2. US-033: Webhooks (3 pts)
-3. US-034: API Pública (5 pts)
-4. US-035: Campos Customizados (5 pts)
+1. US-031: Dashboard Analytics Avançado (5 pts) - Pendente Sprint 3
+2. US-032: Integração com Email (8 pts)
+3. US-033: Webhooks (3 pts)
+4. US-034: API Pública (5 pts)
+5. US-035: Campos Customizados (5 pts)
+
+**Total Sprint 5:** 26 pontos
 
 ---
 
@@ -522,8 +531,9 @@ Foco em:
 
 ### Desenvolvimento
 
-- [x] Todas as 5 User Stories implementadas
-- [x] Todos os endpoints API funcionais
+- [x] 5 de 6 User Stories implementadas (83%)
+- [ ] US-031 pendente (Analytics Avançado)
+- [x] Todos os endpoints API funcionais (das US completas)
 - [x] Todos os componentes React criados
 - [x] Todas as páginas Next.js funcionais
 - [x] Migrations aplicadas no Supabase
@@ -552,9 +562,152 @@ Foco em:
 
 ---
 
+## ⏳ User Story Pendente
+
+### US-031: Dashboard Analytics Avançado (5 pts)
+
+**Status:** Não Iniciada  
+**Prioridade:** Média  
+**Dependências:** US-029 (Relatório de Conversão) ✅
+
+#### Descrição
+
+**Como** gestor  
+**Quero** ver métricas avançadas de performance  
+**Para** tomar decisões baseadas em dados
+
+#### Critérios de Aceitação
+
+- [ ] Gráfico de origem de leads (Fonte: site, indicação, etc)
+- [ ] Performance de vendedor (se multi-usuário)
+- [ ] Receita prevista vs realizada
+- [ ] Tendências (crescimento mês a mês)
+- [ ] Metas e progresso
+- [ ] Comparação período anterior
+- [ ] Top performers e bottom performers
+- [ ] Forecast de receita (3 meses)
+
+#### Escopo Técnico Planejado
+
+**1. Backend APIs**
+```typescript
+// GET /api/analytics/revenue - Análise de receita
+// GET /api/analytics/pipeline - Distribuição do pipeline
+// GET /api/analytics/performance - Métricas de performance
+// GET /api/analytics/forecast - Previsão de receita
+// GET /api/analytics/trends - Tendências históricas
+```
+
+**2. Componentes de Visualização**
+- `RevenueChart` - Gráfico de receita (área + linha)
+- `PipelineDistribution` - Gráfico de pizza (valor por estágio)
+- `PerformanceMetrics` - Cards com KPIs + sparklines
+- `ForecastChart` - Projeção futura (área com confiança)
+- `TrendsChart` - Comparação mês a mês (barras agrupadas)
+- `LeadsSourceChart` - Origem dos leads (donut)
+- `GoalsProgress` - Barras de progresso com metas
+
+**3. Páginas**
+- `/dashboard/analytics` - Dashboard principal de analytics
+- Tabs: Receita, Pipeline, Performance, Forecast, Tendências
+
+**4. Features Avançadas**
+- Filtros por período (7d, 30d, 90d, custom)
+- Comparação com período anterior
+- Download de gráficos (PNG/PDF)
+- Cache de queries pesadas
+- Real-time updates (opcional)
+
+#### Estimativa de Esforço
+
+| Tarefa | Tempo Estimado |
+|--------|----------------|
+| APIs de analytics (5 endpoints) | 3-4 horas |
+| Queries SQL complexas | 2-3 horas |
+| Componentes de gráficos (7) | 4-5 horas |
+| Página principal + routing | 1-2 horas |
+| Filtros e interatividade | 2 horas |
+| Testes e ajustes | 2 horas |
+| **Total** | **14-18 horas** |
+
+#### Arquivos a Criar
+
+```
+src/app/api/analytics/
+├── revenue/route.ts          (100 linhas)
+├── pipeline/route.ts         (80 linhas)
+├── performance/route.ts      (120 linhas)
+├── forecast/route.ts         (150 linhas)
+└── trends/route.ts           (90 linhas)
+
+src/components/analytics/
+├── revenue-chart.tsx         (180 linhas)
+├── pipeline-distribution.tsx (140 linhas)
+├── performance-metrics.tsx   (200 linhas)
+├── forecast-chart.tsx        (160 linhas)
+├── trends-chart.tsx          (140 linhas)
+├── leads-source-chart.tsx    (120 linhas)
+└── goals-progress.tsx        (100 linhas)
+
+src/app/(dashboard)/dashboard/analytics/
+├── page.tsx                  (250 linhas)
+├── revenue/page.tsx          (150 linhas)
+├── pipeline/page.tsx         (130 linhas)
+├── performance/page.tsx      (160 linhas)
+└── forecast/page.tsx         (140 linhas)
+```
+
+**Total estimado:** ~2.210 linhas de código
+
+#### Bibliotecas Necessárias
+
+- ✅ `recharts` - Já instalada (usado em US-029)
+- ⏳ `date-fns` - Manipulação de datas
+- ⏳ `react-to-print` - Export de gráficos (opcional)
+
+#### Dependências de Dados
+
+**Campos necessários no database:**
+- `deals.expected_close_date` ✅ (já existe)
+- `deals.actual_close_date` ⏳ (criar migration)
+- `contacts.source` ✅ (já existe)
+- `deals.closed_value` ⏳ (valor real ao fechar)
+- `goals` ⏳ (nova tabela para metas)
+
+#### Motivo do Adiamento
+
+Esta US foi deixada para depois por:
+1. **Complexidade alta** - Requer queries SQL avançadas
+2. **Tempo estimado** - 14-18 horas de desenvolvimento
+3. **Dependência de dados** - Precisa de mais dados históricos
+4. **Prioridade relativa** - Features anteriores são mais críticas
+5. **Otimização primeiro** - Sprint 4 foca em performance
+
+#### Quando Implementar
+
+**Recomendação:** Implementar após Sprint 4 (Otimização)
+
+**Razões:**
+- Sistema estará mais performático para gráficos pesados
+- Teremos mais dados históricos acumulados
+- Queries estarão otimizadas com índices
+- Caching estará implementado
+
+**Alternativa:** Pode ser dividida em 2 sprints:
+- Sprint 3.1: Gráficos básicos (receita, pipeline) - 2 pts
+- Sprint 3.2: Gráficos avançados (forecast, trends) - 3 pts
+
+#### Links Relacionados
+
+- Documento detalhado: `docs/US-031_ANALYTICS_AVANCADO.md` (será criado)
+- Issue GitHub: (criar quando priorizar)
+- Protótipos: (criar mockups antes de implementar)
+
+---
+
 ## 📝 Notas Finais
 
-Sprint 3 foi extremamente produtiva, entregando 100% do planejado em tempo recorde. A qualidade do código foi mantida através de automações (Husky, ESLint, Prettier) e todos os bugs encontrados foram corrigidos durante a sprint.
+Sprint 3 foi extremamente produtiva, entregando **79% do planejado** (19/24 pontos) em tempo recorde. A qualidade do código foi mantida através de automações (Husky, ESLint, Prettier) e todos os bugs encontrados foram corrigidos durante a sprint.
 
 O sistema agora possui:
 
@@ -563,8 +716,12 @@ O sistema agora possui:
 - ✅ Gestão de tarefas
 - ✅ Relatórios de conversão
 - ✅ Exportação de dados
+- ⏳ Analytics avançado (pendente)
 
-Próximo foco: **Otimização de performance** (Sprint 4).
+**Próximos passos:**
+1. Sprint 4: Otimização de performance (13 pts)
+2. Sprint 3.1: US-031 - Analytics Avançado (5 pts)
+3. Sprint 5: Integrações (Email, Webhooks)
 
 ---
 

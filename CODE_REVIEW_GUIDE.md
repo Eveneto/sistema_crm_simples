@@ -272,6 +272,75 @@ await sleep(100);
 
 ---
 
+### 2.7 Testes (Test-Driven Mindset)
+
+### Pirâmide de Testes
+```
+       E2E (10%)
+      /         \
+     /  Integração (30%)
+    /                   \
+   /   Unitários (60%)   \
+  /_______________________\
+```
+
+### Testes Unitários
+
+```typescript
+// ✅ BOM - Nome descritivo + AAA pattern
+describe('calculateDiscount', () => {
+  it('deve retornar 20% de desconto para usuários premium com pedido > 100', () => {
+    // Arrange
+    const user = { isPremium: true };
+    const order = { total: 150 };
+
+    // Act
+    const discount = calculateDiscount(user, order);
+
+    // Assert
+    expect(discount).toBe(30); // 20% de 150
+  });
+
+  it('deve retornar 0 para usuários não premium', () => {
+    const user = { isPremium: false };
+    const order = { total: 150 };
+
+    expect(calculateDiscount(user, order)).toBe(0);
+  });
+});
+```
+
+### Testes de Componentes React
+
+```typescript
+// ✅ BOM - Testa comportamento, não implementação
+import { render, screen, fireEvent } from '@testing-library/react';
+
+describe('CustomerForm', () => {
+  it('deve exibir erro quando email for inválido', async () => {
+    render(<CustomerForm />);
+    
+    const emailInput = screen.getByLabelText(/email/i);
+    const submitButton = screen.getByRole('button', { name: /salvar/i });
+    
+    fireEvent.change(emailInput, { target: { value: 'email-invalido' } });
+    fireEvent.click(submitButton);
+    
+    expect(await screen.findByText(/email inválido/i)).toBeInTheDocument();
+  });
+});
+```
+
+### Regras de Ouro dos Testes
+
+- [ ] **F.I.R.S.T**: Fast, Independent, Repeatable, Self-validating, Timely
+- [ ] **1 assert por teste** (ou asserts relacionados ao mesmo conceito)
+- [ ] **Teste o comportamento, não a implementação**
+- [ ] **Mocks simples** - não teste o mock, teste a função
+- [ ] **Nome do teste = documentação** - deve ser claro sem ler o código
+
+---
+
 ## 3. Checklist de Code Review
 
 Use em **todo Pull Request**:
@@ -684,3 +753,130 @@ Quem segue rigorosamente este guia reduz em até **70% o tempo de manutenção**
 **Versão:** 1.0.0
 
 _Mantenha este guia vivo: proponha melhorias via PR!_
+
+## 6.5 Segurança (OWASP Top 10 Essencial)
+
+### XSS (Cross-Site Scripting)
+
+```typescript
+// ❌ RUIM - Vulnerável a XSS
+function UserGreeting({ name }: { name: string }) {
+  return <div dangerouslySetInnerHTML={{ __html: `Olá ${name}` }} />;
+}
+
+// ✅ BOM - React escapa automaticamente
+function UserGreeting({ name }: { name: string }) {
+  return <div>Olá {name}</div>;
+}
+```
+
+### SQL Injection
+
+```typescript
+// ❌ RUIM - Vulnerável
+const query = `SELECT * FROM users WHERE email = '${email}'`;
+
+// ✅ BOM - Prepared statements (Prisma/TypeORM já fazem isso)
+const user = await prisma.user.findUnique({
+  where: { email }
+});
+```
+
+### Autenticação Segura
+
+```typescript
+// ❌ RUIM - Token no localStorage (vulnerável a XSS)
+localStorage.setItem('token', token);
+
+// ✅ BOM - HttpOnly cookie (Next.js API routes)
+export async function POST(req: Request) {
+  const { email, password } = await req.json();
+  
+  const token = await authenticate(email, password);
+  
+  return new Response(JSON.stringify({ success: true }), {
+    headers: {
+      'Set-Cookie': `token=${token}; HttpOnly; Secure; SameSite=Strict; Path=/`
+    }
+  });
+}
+```
+
+### Checklist de Segurança Mínimo
+
+- [ ] Variáveis sensíveis no `.env` (nunca commitadas)
+- [ ] Validação de input no backend (nunca confie no frontend)
+- [ ] Rate limiting em APIs públicas
+- [ ] CORS configurado corretamente
+- [ ] Dependências atualizadas (Snyk/Dependabot)
+- [ ] Secrets rotacionados periodicamente
+- [ ] Logs não expõem dados sensíveis
+
+## 2.9 Performance (Next.js Específico)
+
+### Otimização de Imagens
+
+```tsx
+// ❌ RUIM
+<img src="/logo.png" alt="Logo" width={200} />
+
+// ✅ BOM - Next.js Image otimiza automaticamente
+import Image from 'next/image';
+
+<Image 
+  src="/logo.png" 
+  alt="Logo" 
+  width={200} 
+  height={50}
+  priority  // Para above-the-fold
+/>
+```
+
+### Code Splitting
+
+```tsx
+// ❌ RUIM - Carrega tudo no bundle inicial
+import HeavyChart from './HeavyChart';
+
+// ✅ BOM - Lazy loading
+import dynamic from 'next/dynamic';
+
+const HeavyChart = dynamic(() => import('./HeavyChart'), {
+  loading: () => <Spinner />,
+  ssr: false  // Se não precisar de SSR
+});
+```
+
+### Memoização Consciente
+
+```tsx
+// ❌ RUIM - useMemo desnecessário (operação simples)
+const fullName = useMemo(() => `${firstName} ${lastName}`, [firstName, lastName]);
+
+// ✅ BOM - useMemo só para cálculos pesados
+const expensiveCalculation = useMemo(() => {
+  return items.reduce((acc, item) => {
+    // processamento complexo
+    return acc + heavyOperation(item);
+  }, 0);
+}, [items]);
+```
+
+### Server Components (Next.js 14+)
+
+```tsx
+// ✅ BOM - Por padrão, componentes são Server Components
+async function CustomerList() {
+  const customers = await fetchCustomers(); // Roda no servidor
+  
+  return (
+    <div>
+      {customers.map(c => <CustomerCard key={c.id} customer={c} />)}
+    </div>
+  );
+}
+
+// Use 'use client' apenas quando necessário:
+// - useState, useEffect, event handlers
+// - Browser APIs (window, localStorage)
+```
