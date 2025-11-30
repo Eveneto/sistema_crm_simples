@@ -54,7 +54,8 @@ export default function ConversationsPage() {
           throw new Error('Erro ao buscar contatos');
         }
         const contactsData = await contactsResponse.json();
-        setContacts(contactsData);
+        // API retorna { data: [...], pagination: {...} }
+        setContacts(contactsData.data || []);
 
         // Auto-select first conversation
         if (conversationsData.length > 0 && !selectedId) {
