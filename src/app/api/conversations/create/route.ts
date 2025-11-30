@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { contact_id, channel_id = 'whatsapp' } = body;
+    const { contact_id, channel_type = 'whatsapp' } = body;
 
     // Validações
     if (!contact_id) {
@@ -51,12 +51,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Obter channel_id baseado no tipo (whatsapp, telegram, etc)
+    const { data: channel, error: channelError } = await supabase
+      .from('channels')
+      .select('id')
+      .eq('type', channel_type)
+      .single() as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    if (channelError || !channel) {
+      return NextResponse.json(
+        { error: `Canal '${channel_type}' não encontrado`, details: 'Crie um canal primeiro' },
+        { status: 404 }
+      );
+    }
+
     // Verificar se conversa já existe para este contato+canal
     const { data: existingConversation } = await supabase
       .from('conversations')
       .select('id')
       .eq('contact_id', contact_id)
-      .eq('channel_id', channel_id)
+      .eq('channel_id', channel.id)
       .single();
 
     // Se já existe, retornar
@@ -72,7 +86,7 @@ export async function POST(request: NextRequest) {
       .from('conversations')
       .insert({
         contact_id,
-        channel_id,
+        channel_id: channel.id, // Usar UUID do channel encontrado
         assigned_to: user.id, // Atribuir ao usuário atual
         status: 'open',
         unread_count: 0,

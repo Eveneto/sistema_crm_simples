@@ -56,7 +56,7 @@ export function CreateConversationDialog({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contact_id: selectedContactId,
-          channel_id: 'whatsapp',
+          channel_type: 'whatsapp', // Tipo de canal, API vai buscar o UUID
         }),
       });
 
