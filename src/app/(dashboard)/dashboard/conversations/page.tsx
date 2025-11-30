@@ -125,54 +125,23 @@ export default function ConversationsPage() {
   // ============================================
   // Send message handler
   // ============================================
-  const handleSendMessage = async (content: string) => {
-    if (!selectedId) return;
+  const handleSendMessage = async (message: Message) => {
+    // MessageInput já enviou a mensagem para API
+    // Apenas adicionar ao estado local
+    setMessages((prev) => [...prev, message]);
 
-    setSendingMessage(true);
-    try {
-      setError(null);
-      const response = await fetch('/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          conversation_id: selectedId,
-          content
-        })
-      });
+    // Update last_message_at in conversation
+    setConversations((prev) =>
+      prev.map((c) =>
+        c.id === selectedId
+          ? { ...c, last_message_at: new Date().toISOString() }
+          : c
+      )
+    );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao enviar mensagem');
-      }
-
-      const newMessage = await response.json();
-      setMessages((prev) => [...prev, newMessage]);
-
-      // Update last_message_at
-      setConversations((prev) =>
-        prev.map((c) =>
-          c.id === selectedId
-            ? { ...c, last_message_at: new Date().toISOString() }
-            : c
-        )
-      );
-
-      toast({
-        title: 'Sucesso',
-        description: 'Mensagem enviada'
-      });
-    } catch (error) {
-      console.error('Error sending message:', error);
-      const message = error instanceof Error ? error.message : 'Erro ao enviar mensagem';
-      setError(message);
-      toast({
-        title: 'Erro',
-        description: message,
-        variant: 'destructive'
-      });
-    } finally {
-      setSendingMessage(false);
-    }
+    toast({
+      description: 'Mensagem enviada'
+    });
   };
 
   const selectedConversation = conversations.find((c) => c.id === selectedId);

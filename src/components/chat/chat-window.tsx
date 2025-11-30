@@ -21,7 +21,7 @@ interface ChatWindowProps {
   conversation: ConversationWithDetails;
   messages: Message[];
   currentUserId: string;
-  onSendMessage: (content: string) => Promise<void>;
+  onSendMessage: (message: Message) => Promise<void> | void;
   onClose?: () => void;
   loading?: boolean;
 }
@@ -34,8 +34,8 @@ export function ChatWindow({
   onClose,
   loading
 }: ChatWindowProps) {
-  const handleSendMessage = async (content: string) => {
-    await onSendMessage(content);
+  const handleSendMessage = async (message: Message) => {
+    await onSendMessage(message);
   };
 
   return (

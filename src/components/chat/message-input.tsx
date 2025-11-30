@@ -14,10 +14,11 @@ import { Send, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import type { Message } from '@/types/database';
 
 interface MessageInputProps {
   conversationId: string;
-  onMessageSent?: (message: any) => void;
+  onMessageSent?: (message: Message) => void;
   disabled?: boolean;
 }
 
