@@ -19,7 +19,7 @@ SELECT id, email FROM auth.users LIMIT 1;
 -- (Substitua 'SEU_USER_ID_AQUI' pelo UUID real)
 -- ============================================
 UPDATE conversations
-SET assigned_to = 'SEU_USER_ID_AQUI'::uuid
+SET assigned_to = '2bb3b762-2e2b-4c12-a0d2-3d7818529f40'::uuid
 WHERE assigned_to IS NULL;
 
 -- Verificar se funcionou

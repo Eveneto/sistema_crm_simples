@@ -23,17 +23,25 @@ export async function POST(request: NextRequest) {
 
     // Parse e valida o corpo da requisição
     const body = await request.json();
+    console.log('[DEBUG] Creating message with body:', body);
+    
     const validated = createMessageSchema.parse(body);
+    console.log('[DEBUG] Validation passed:', validated);
 
-    // Verificar que a conversa pertence ao usuário
+    // Verificar que a conversa existe e pertence ao usuário ou está sem atribuição
     const { data: conversation, error: convError } = await supabase
       .from('conversations')
       .select('id')
       .eq('id', validated.conversation_id)
-      .eq('assigned_to', user.id)
+      .or(`assigned_to.eq.${user.id},assigned_to.is.null`) // Usuário OU sem atribuição
       .single();
 
     if (convError || !conversation) {
+      console.log('[DEBUG] Conversation not found:', { 
+        conversation_id: validated.conversation_id, 
+        user_id: user.id,
+        error: convError 
+      });
       return NextResponse.json(
         { error: 'Conversa não encontrada' },
         { status: 404 }
@@ -77,6 +85,7 @@ export async function POST(request: NextRequest) {
       'issues' in error
     ) {
       const zodError = error as any;
+      console.error('[DEBUG] Validation error:', zodError.issues);
       return NextResponse.json(
         {
           error: 'Validação falhou',
