@@ -36,9 +36,8 @@ export async function GET() {
     });
 
     // Buscar conversas com detalhes do contato
-    // Tentar duas abordagens:
-    // 1. Conversas atribuídas ao usuário
-    const { data: conversationsByAssigned, error: error1 } = await supabase
+    // Filtrar por usuário autenticado OU conversas sem atribuição (assigned_to IS NULL)
+    const { data: conversations, error: conversationsError } = await supabase
       .from('conversations')
       .select(
         `
@@ -51,48 +50,22 @@ export async function GET() {
         contact:contacts(id, name, avatar_url, phone, email)
         `
       )
-      .eq('assigned_to', user.id)
+      .or(`assigned_to.eq.${user.id},assigned_to.is.null`) // Conversas do usuário OU sem atribuição
       .order('last_message_at', { ascending: false, nullsFirst: false })
       .limit(100);
 
-    console.log('[DEBUG] By assigned_to:', {
-      count: conversationsByAssigned?.length,
-      error: error1
+    console.log('[DEBUG] Conversations fetched:', {
+      count: conversations?.length,
+      userId: user.id,
+      error: conversationsError
     });
 
-    if (error1) {
-      console.error('[DEBUG] Error with assigned_to filter:', error1);
+    if (conversationsError) {
+      console.error('[DEBUG] Error fetching conversations:', conversationsError);
+      return NextResponse.json([], { status: 200 }); // Retornar array vazio se tiver erro
     }
 
-    // Se não encontrar com assigned_to, buscar todas (sem filtro)
-    if (!conversationsByAssigned || conversationsByAssigned.length === 0) {
-      console.log('[DEBUG] No conversations found with assigned_to filter, trying without filter');
-      
-      const { data: allConv, error: error2 } = await supabase
-        .from('conversations')
-        .select(
-          `
-          id,
-          status,
-          unread_count,
-          last_message_at,
-          created_at,
-          updated_at,
-          contact:contacts(id, name, avatar_url, phone, email)
-          `
-        )
-        .order('last_message_at', { ascending: false, nullsFirst: false })
-        .limit(100);
-
-      console.log('[DEBUG] Without filter:', {
-        count: allConv?.length,
-        error: error2
-      });
-
-      return NextResponse.json(allConv || []);
-    }
-
-    return NextResponse.json(conversationsByAssigned || []);
+    return NextResponse.json(conversations || []);
   } catch (error) {
     console.error('GET /api/conversations error:', error);
     return NextResponse.json(
