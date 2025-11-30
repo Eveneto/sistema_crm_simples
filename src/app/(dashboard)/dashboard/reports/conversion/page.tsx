@@ -1,4 +1,15 @@
-import { ConversionReport } from '@/components/reports/conversion-report';
+import dynamic from 'next/dynamic';
+
+// Dynamic import para ConversionReport (code splitting)
+const ConversionReport = dynamic(
+  () => import('@/components/reports/conversion-report').then(mod => mod.ConversionReport),
+  {
+    loading: () => <ReportSkeleton />,
+    ssr: false, // Client-side only para gráficos pesados
+  }
+);
+
+import { ReportSkeleton } from '@/components/reports/report-skeleton';
 
 export default function ConversionReportPage() {
   return (

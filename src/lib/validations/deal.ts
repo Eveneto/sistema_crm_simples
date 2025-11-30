@@ -12,8 +12,8 @@ import { z } from 'zod';
  */
 export const createDealSchema = z.object({
   title: z.string().min(1, 'Título é obrigatório').max(200, 'Título muito longo'),
-  contact_id: z.string().uuid('Contato é obrigatório'),
-  stage_id: z.string().uuid('Estágio é obrigatório'),
+  contact_id: z.string().min(1, 'Contato é obrigatório'),
+  stage_id: z.string().min(1, 'Estágio é obrigatório'),
   value: z.number().min(0, 'Valor deve ser positivo').default(0),
   expected_close_date: z.string().optional(),
   description: z.string().max(1000, 'Descrição muito longa').optional(),

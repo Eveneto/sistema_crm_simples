@@ -27,22 +27,46 @@ export function ContactAutocomplete({ value, onSelect, disabled }: ContactAutoco
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<Contact | undefined>();
 
   const debouncedQuery = useDebounce(query, 300);
 
+  // Carregar todos os contatos ao abrir o dropdown (sem query)
   useEffect(() => {
-    if (debouncedQuery.length < 2) {
-      setResults([]);
+    if (open && results.length === 0 && !query) {
+      searchContacts('');
+    }
+  }, [open]);
+
+  // Buscar contatos quando o query muda
+  useEffect(() => {
+    if (debouncedQuery.length === 0) {
+      // Se vazio, mostra todos (apenas se dropdown está aberto)
+      if (open) {
+        searchContacts('');
+      }
       return;
     }
 
     searchContacts(debouncedQuery);
-  }, [debouncedQuery]);
+  }, [debouncedQuery, open]);
+
+  // Encontrar contato selecionado quando value muda
+  useEffect(() => {
+    if (value && results.length > 0) {
+      const contact = results.find((c) => c.id === value);
+      setSelectedContact(contact);
+    }
+  }, [value, results]);
 
   async function searchContacts(searchQuery: string) {
     setLoading(true);
     try {
-      const response = await fetch(`/api/contacts?search=${encodeURIComponent(searchQuery)}&limit=10`);
+      const url = searchQuery
+        ? `/api/contacts?search=${encodeURIComponent(searchQuery)}&limit=50`
+        : `/api/contacts?limit=50`; // Sem query, retorna todos
+      
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Erro ao buscar contatos');
       }
@@ -56,7 +80,13 @@ export function ContactAutocomplete({ value, onSelect, disabled }: ContactAutoco
     }
   }
 
-  const selectedContact = results.find((contact) => contact.id === value);
+  const handleSelectContact = (contactId: string) => {
+    const contact = results.find((c) => c.id === contactId);
+    setSelectedContact(contact);
+    onSelect(contactId);
+    setOpen(false);
+    setQuery('');
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -89,17 +119,16 @@ export function ContactAutocomplete({ value, onSelect, disabled }: ContactAutoco
             {!loading && results.length === 0 && query.length >= 2 && (
               <CommandEmpty>Nenhum contato encontrado.</CommandEmpty>
             )}
+            {!loading && results.length === 0 && !query && (
+              <CommandEmpty>Clique para carregare contatos...</CommandEmpty>
+            )}
             {!loading && results.length > 0 && (
               <CommandGroup>
                 {results.map((contact) => (
                   <CommandItem
                     key={contact.id}
                     value={contact.id}
-                    onSelect={() => {
-                      onSelect(contact.id);
-                      setOpen(false);
-                      setQuery('');
-                    }}
+                    onSelect={() => handleSelectContact(contact.id)}
                   >
                     <Check
                       className={cn(

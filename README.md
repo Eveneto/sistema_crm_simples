@@ -1,213 +1,183 @@
-# CRM Simplificado
+# Supabase CLI
 
-Sistema completo de CRM com integração WhatsApp, desenvolvido com Next.js 14, TypeScript e Supabase.
+[![Coverage Status](https://coveralls.io/repos/github/supabase/cli/badge.svg?branch=main)](https://coveralls.io/github/supabase/cli?branch=main) [![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/supabase-cli/setup-cli/master?style=flat-square&label=Bitbucket%20Canary)](https://bitbucket.org/supabase-cli/setup-cli/pipelines) [![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/sweatybridge%2Fsetup-cli?label=Gitlab%20Canary)
+](https://gitlab.com/sweatybridge/setup-cli/-/pipelines)
 
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
-![Next.js](https://img.shields.io/badge/Next.js-14-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+[Supabase](https://supabase.io) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
 
-🔗 **Repositório:** [github.com/Eveneto/sistema_crm_simples](https://github.com/Eveneto/sistema_crm_simples)
+This repository contains all the functionality for Supabase CLI.
 
-## 🚀 Stack Tecnológica
+- [x] Running Supabase locally
+- [x] Managing database migrations
+- [x] Creating and deploying Supabase Functions
+- [x] Generating types directly from your database schema
+- [x] Making authenticated HTTP requests to [Management API](https://supabase.com/docs/reference/api/introduction)
 
-- **Frontend:** Next.js 14 (App Router) + TypeScript
-- **Estilização:** Tailwind CSS + shadcn/ui
-- **Backend:** Supabase (PostgreSQL + Auth + Realtime)
-- **WhatsApp:** Evolution API
-- **Estado Global:** Zustand
-- **Gráficos:** Recharts
-- **Drag and Drop:** @dnd-kit
+## Getting started
 
-## 📋 Funcionalidades
+### Install the CLI
 
-- ✅ Sistema de autenticação completo
-- ✅ Dashboard com métricas em tempo real
-- ✅ Gestão de conversas com WhatsApp
-- ✅ CRM com Kanban de negócios
-- ✅ Gestão de contatos e atividades
-- ✅ Integração com múltiplos canais
-- ✅ Tema dark/light
-- ✅ Notificações em tempo real
-
-## 🛠️ Instalação e Configuração
-
-### Pré-requisitos
-
-- Node.js 18+ instalado
-- Conta no Supabase (gratuita)
-- Evolution API configurada (opcional para WhatsApp)
-
-### Passo a passo
-
-1. **Clone o repositório:**
+Available via [NPM](https://www.npmjs.com) as dev dependency. To install:
 
 ```bash
-git clone https://github.com/Eveneto/sistema_crm_simples.git
-cd sistema_crm_simples
+npm i supabase --save-dev
 ```
 
-2. **Instale as dependências:**
+To install the beta release channel:
 
 ```bash
-npm install
+npm i supabase@beta --save-dev
 ```
 
-3. **Configure as variáveis de ambiente:**
+When installing with yarn 4, you need to disable experimental fetch with the following nodejs config.
+
+```
+NODE_OPTIONS=--no-experimental-fetch yarn add supabase
+```
+
+> **Note**
+For Bun versions below v1.0.17, you must add `supabase` as a [trusted dependency](https://bun.sh/guides/install/trusted) before running `bun add -D supabase`.
+
+<details>
+  <summary><b>macOS</b></summary>
+
+  Available via [Homebrew](https://brew.sh). To install:
+
+  ```sh
+  brew install supabase/tap/supabase
+  ```
+
+  To install the beta release channel:
+  
+  ```sh
+  brew install supabase/tap/supabase-beta
+  brew link --overwrite supabase-beta
+  ```
+  
+  To upgrade:
+
+  ```sh
+  brew upgrade supabase
+  ```
+</details>
+
+<details>
+  <summary><b>Windows</b></summary>
+
+  Available via [Scoop](https://scoop.sh). To install:
+
+  ```powershell
+  scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+  scoop install supabase
+  ```
+
+  To upgrade:
+
+  ```powershell
+  scoop update supabase
+  ```
+</details>
+
+<details>
+  <summary><b>Linux</b></summary>
+
+  Available via [Homebrew](https://brew.sh) and Linux packages.
+
+  #### via Homebrew
+
+  To install:
+
+  ```sh
+  brew install supabase/tap/supabase
+  ```
+
+  To upgrade:
+
+  ```sh
+  brew upgrade supabase
+  ```
+
+  #### via Linux packages
+
+  Linux packages are provided in [Releases](https://github.com/supabase/cli/releases). To install, download the `.apk`/`.deb`/`.rpm`/`.pkg.tar.zst` file depending on your package manager and run the respective commands.
+
+  ```sh
+  sudo apk add --allow-untrusted <...>.apk
+  ```
+
+  ```sh
+  sudo dpkg -i <...>.deb
+  ```
+
+  ```sh
+  sudo rpm -i <...>.rpm
+  ```
+
+  ```sh
+  sudo pacman -U <...>.pkg.tar.zst
+  ```
+</details>
+
+<details>
+  <summary><b>Other Platforms</b></summary>
+
+  You can also install the CLI via [go modules](https://go.dev/ref/mod#go-install) without the help of package managers.
+
+  ```sh
+  go install github.com/supabase/cli@latest
+  ```
+
+  Add a symlink to the binary in `$PATH` for easier access:
+
+  ```sh
+  ln -s "$(go env GOPATH)/bin/cli" /usr/bin/supabase
+  ```
+
+  This works on other non-standard Linux distros.
+</details>
+
+<details>
+  <summary><b>Community Maintained Packages</b></summary>
+
+  Available via [pkgx](https://pkgx.sh/). Package script [here](https://github.com/pkgxdev/pantry/blob/main/projects/supabase.com/cli/package.yml).
+  To install in your working directory:
+
+  ```bash
+  pkgx install supabase
+  ```
+
+  Available via [Nixpkgs](https://nixos.org/). Package script [here](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/tools/supabase-cli/default.nix).
+</details>
+
+### Run the CLI
 
 ```bash
-cp .env.example .env.local
+supabase bootstrap
 ```
 
-Edite o arquivo `.env.local` com suas credenciais:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=sua_url_do_supabase
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
-EVOLUTION_API_URL=sua_evolution_api_url
-EVOLUTION_API_KEY=sua_evolution_api_key
-```
-
-4. **Configure o banco de dados Supabase:**
-
-- Acesse [supabase.com](https://supabase.com)
-- Crie um novo projeto
-- Execute os scripts SQL em `supabase/migrations/`
-
-5. **Rode o projeto em desenvolvimento:**
+Or using npx:
 
 ```bash
-npm run dev
+npx supabase bootstrap
 ```
 
-Acesse [http://localhost:3000](http://localhost:3000)
+The bootstrap command will guide you through the process of setting up a Supabase project using one of the [starter](https://github.com/supabase-community/supabase-samples/blob/main/samples.json) templates.
 
-## � Documentação do Projeto
+## Docs
 
-Este projeto possui documentação completa e profissional:
+Command & config reference can be found [here](https://supabase.com/docs/reference/cli/about).
 
-| Documento                                          | Descrição                                     |
-| -------------------------------------------------- | --------------------------------------------- |
-| [CODE_REVIEW_GUIDE.md](CODE_REVIEW_GUIDE.md)       | Guia completo de Clean Code e Code Review     |
-| [PLANEJAMENTO_TECNICO.md](PLANEJAMENTO_TECNICO.md) | Arquitetura técnica e stack detalhada         |
-| [PLANEJAMENTO_SCRUM.md](PLANEJAMENTO_SCRUM.md)     | Metodologia Ágil Scrum + Roadmap de 6 sprints |
-| [TEMPLATES_SCRUM.md](TEMPLATES_SCRUM.md)           | Templates práticos para cerimônias e gestão   |
-| [CONTRIBUTING.md](CONTRIBUTING.md)                 | Guia de contribuição para desenvolvedores     |
-| [SETUP.md](SETUP.md)                               | Guia de instalação e configuração             |
+## Breaking changes
 
-## �📁 Estrutura do Projeto
+We follow semantic versioning for changes that directly impact CLI commands, flags, and configurations.
 
+However, due to dependencies on other service images, we cannot guarantee that schema migrations, seed.sql, and generated types will always work for the same CLI major version. If you need such guarantees, we encourage you to pin a specific version of CLI in package.json.
+
+## Developing
+
+To run from source:
+
+```sh
+# Go >= 1.22
+go run . help
 ```
-src/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Rotas de autenticação
-│   ├── (dashboard)/       # Rotas protegidas
-│   └── api/               # API Routes
-├── components/            # Componentes React
-│   ├── ui/               # shadcn/ui components
-│   ├── layout/           # Layout components
-│   ├── dashboard/        # Dashboard components
-│   ├── chat/             # Chat components
-│   └── kanban/           # Kanban components
-├── lib/                   # Utilitários e configurações
-│   ├── supabase/         # Cliente Supabase
-│   └── evolution/        # Cliente Evolution API
-├── stores/               # Zustand stores
-├── types/                # TypeScript types
-└── hooks/                # Custom hooks
-```
-
-## 🎨 Padrões de Código
-
-Este projeto segue rigorosamente os princípios de **Clean Code**. Consulte:
-
-- [CODE_REVIEW_GUIDE.md](CODE_REVIEW_GUIDE.md) - Guia completo de boas práticas
-- [PLANEJAMENTO_TECNICO.md](PLANEJAMENTO_TECNICO.md) - Planejamento técnico detalhado
-
-### Principais regras:
-
-- ✅ Funções com ≤ 20 linhas
-- ✅ Nomes descritivos (sem abreviações)
-- ✅ Single Responsibility Principle
-- ✅ TypeScript strict mode
-- ✅ Sem `any` (use tipos específicos)
-- ✅ Testes para novas funcionalidades
-
-## 🧪 Testes
-
-```bash
-# Rodar testes
-npm test
-
-# Rodar testes em watch mode
-npm run test:watch
-
-# Cobertura de testes
-npm run test:coverage
-```
-
-## 📦 Build e Deploy
-
-```bash
-# Build de produção
-npm run build
-
-# Rodar build localmente
-npm start
-```
-
-### Deploy na Vercel (recomendado)
-
-1. Conecte seu repositório GitHub à Vercel
-2. Configure as variáveis de ambiente
-3. Deploy automático a cada push na `main`
-
-## 🤝 Contribuindo
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
-3. Commit suas mudanças (`git commit -m 'feat: adiciona nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/nova-funcionalidade`)
-5. Abra um Pull Request
-
-**Importante:** Todo PR deve seguir o [CODE_REVIEW_GUIDE.md](CODE_REVIEW_GUIDE.md)
-
-## 📝 Scripts Disponíveis
-
-```bash
-npm run dev          # Servidor de desenvolvimento
-npm run build        # Build de produção
-npm run start        # Roda build de produção
-npm run lint         # Roda ESLint
-npm run lint:fix     # Corrige problemas do ESLint
-npm run format       # Formata código com Prettier
-npm run type-check   # Verifica tipos TypeScript
-```
-
-## 🔒 Segurança
-
-- Nunca commite arquivos `.env`
-- Use variáveis de ambiente para credenciais
-- Todas as rotas protegidas têm middleware de autenticação
-- Validação de dados no backend (Supabase RLS)
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
-## 👥 Autores
-
-- Eveneto - [@Eveneto](https://github.com/Eveneto)
-
-## 🙏 Agradecimentos
-
-- [shadcn/ui](https://ui.shadcn.com/) - Componentes UI
-- [Supabase](https://supabase.com/) - Backend as a Service
-- [Evolution API](https://evolution-api.com/) - WhatsApp Integration
-- Comunidade Next.js e React
-
----
-
-**Desenvolvido com ❤️ seguindo princípios de Clean Code**
-
-# Test CI

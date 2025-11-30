@@ -3,9 +3,8 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { createDealSchema, type CreateDealInput } from '@/lib/validations/deal';
-import { Deal, PipelineStage } from '@/types/deal';
+import { createDealSchema, updateDealSchema } from '@/lib/validations/deal';
+import { DealWithRelations, PipelineStage } from '@/types/deal';
 import { ContactAutocomplete } from './contact-autocomplete';
 import {
   Form,
@@ -27,12 +26,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import type { z } from 'zod';
 
-type FormData = z.infer<typeof createDealSchema>;
+type CreateDealForm = z.infer<typeof createDealSchema>;
+type UpdateDealForm = z.infer<typeof updateDealSchema>;
 
 interface DealFormProps {
   mode: 'create' | 'edit';
-  initialData?: Deal;
+  initialData?: DealWithRelations;
   stages: PipelineStage[];
   onSuccess: () => void;
   onCancel: () => void;
@@ -41,24 +42,44 @@ interface DealFormProps {
 export function DealForm({ mode, initialData, stages, onSuccess, onCancel }: DealFormProps) {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  // Choose schema based on mode
+  const schema = mode === 'edit' ? updateDealSchema : createDealSchema;
 
-  const form = useForm<FormData>({
-    resolver: zodResolver(createDealSchema),
+  const form = useForm<CreateDealForm | UpdateDealForm>({
+    resolver: zodResolver(schema),
     defaultValues: {
       title: initialData?.title || '',
-      value: initialData?.value ?? 0,
+      value: initialData?.value ?? undefined,
       contact_id: initialData?.contact_id || '',
-      stage_id: initialData?.stage_id || stages[0]?.id || '',
+      stage_id: initialData?.stage_id || (stages.length > 0 ? stages[0].id : ''),
       expected_close_date: initialData?.expected_close_date || '',
       description: '',
     },
   });
 
-  async function onSubmit(data: CreateDealInput) {
+  // Handle value field as string to allow clearing zero
+  const [valueString, setValueString] = useState(
+    initialData?.value ? initialData.value.toString() : ''
+  );
+
+  const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setValueString(value);
+    const numValue = value === '' ? undefined : parseFloat(value);
+    form.setValue('value', numValue);
+  };
+
+  async function onSubmit(data: CreateDealForm | UpdateDealForm) {
     setLoading(true);
     try {
-      const response = await fetch('/api/deals', {
-        method: 'POST',
+      const method = mode === 'edit' ? 'PATCH' : 'POST';
+      const url = mode === 'edit' ? `/api/deals/${initialData?.id}` : '/api/deals';
+      
+      // eslint-disable-next-line no-console
+      console.log('Deal Form Submit:', { mode, method, url, data, initialDataId: initialData?.id });
+      
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -67,19 +88,26 @@ export function DealForm({ mode, initialData, stages, onSuccess, onCancel }: Dea
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao criar negócio');
+        // eslint-disable-next-line no-console
+        console.error('Response error:', errorData);
+        throw new Error(errorData.error || `Erro ao ${mode === 'edit' ? 'atualizar' : 'criar'} negócio`);
       }
+
+      const responseData = await response.json();
+      // eslint-disable-next-line no-console
+      console.log('Success response:', responseData);
 
       toast({
         title: 'Sucesso',
-        description: 'Negócio criado com sucesso!',
+        description: `Negócio ${mode === 'edit' ? 'atualizado' : 'criado'} com sucesso!`,
       });
       onSuccess();
     } catch (error) {
-      console.error('Erro ao criar negócio:', error);
+      // eslint-disable-next-line no-console
+      console.error(`Erro ao ${mode === 'edit' ? 'atualizar' : 'criar'} negócio:`, error);
       toast({
         title: 'Erro',
-        description: error instanceof Error ? error.message : 'Erro ao criar negócio',
+        description: error instanceof Error ? error.message : `Erro ao ${mode === 'edit' ? 'atualizar' : 'criar'} negócio`,
         variant: 'destructive',
       });
     } finally {
@@ -113,7 +141,7 @@ export function DealForm({ mode, initialData, stages, onSuccess, onCancel }: Dea
         <FormField
           control={form.control}
           name="value"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
               <FormLabel>Valor (R$)</FormLabel>
               <FormControl>
@@ -122,8 +150,8 @@ export function DealForm({ mode, initialData, stages, onSuccess, onCancel }: Dea
                   step="0.01"
                   min="0"
                   placeholder="0.00"
-                  {...field}
-                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                  value={valueString}
+                  onChange={handleValueChange}
                   disabled={loading}
                 />
               </FormControl>
@@ -158,7 +186,7 @@ export function DealForm({ mode, initialData, stages, onSuccess, onCancel }: Dea
           render={({ field }) => (
             <FormItem>
               <FormLabel>Estágio *</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
+              <Select onValueChange={field.onChange} value={field.value} disabled={loading}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um estágio" />

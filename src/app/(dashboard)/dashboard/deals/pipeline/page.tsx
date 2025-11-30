@@ -16,7 +16,7 @@ import { DealForm } from '@/components/deals/deal-form';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PlusCircle } from 'lucide-react';
-import type { PipelineStage } from '@/types/deal';
+import type { PipelineStage, DealWithRelations } from '@/types/deal';
 
 export default function PipelinePage() {
   const [stages, setStages] = useState<PipelineStage[]>([]);
@@ -44,10 +44,9 @@ export default function PipelinePage() {
 
       // Buscar stages
       const { data: stages, error: stagesError } = await supabase
-        .from('pipeline_stages')
+        .from('deal_stages')
         .select('*')
-        .eq('is_active', true)
-        .order('order_position', { ascending: true });
+        .order('position', { ascending: true });
 
       if (stagesError) {
         console.error('Error fetching stages:', stagesError);
@@ -60,12 +59,10 @@ export default function PipelinePage() {
         .select(`
           *,
           contact:contacts(id, name, email),
-          stage:pipeline_stages(id, name, color, order_position)
+          stage:deal_stages(id, name, color)
         `)
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .order('position', { ascending: true })
-        .limit(100);
+        .neq('status', 'archived')
+        .order('created_at', { ascending: false });
 
       if (dealsError) {
         console.error('Error fetching deals:', dealsError);
@@ -92,6 +89,10 @@ export default function PipelinePage() {
       setLoading(false);
     }
   }
+
+  const handleEdit = (deal: DealWithRelations) => {
+    router.push(`/dashboard/deals/${deal.id}`);
+  };
 
   const handleSuccess = () => {
     setIsCreateModalOpen(false);
@@ -123,7 +124,7 @@ export default function PipelinePage() {
       {loading ? (
         <PipelineSkeleton />
       ) : (
-        <PipelineBoard stages={stages} />
+        <PipelineBoard stages={stages} onEdit={handleEdit} />
       )}
 
       {/* Modal Criar Negócio */}
