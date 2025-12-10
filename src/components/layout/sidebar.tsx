@@ -11,13 +11,8 @@ import {
   Users,
   MessageSquare,
   FolderKanban,
-  Calendar,
-  BarChart3,
-  Settings,
   ChevronLeft,
   ChevronRight,
-  Zap,
-  CheckSquare,
 } from 'lucide-react';
 import { useUserRole } from '@/hooks/use-user-role';
 
@@ -48,37 +43,6 @@ const navItems: NavItem[] = [
     title: 'Negócios',
     href: '/dashboard/deals/pipeline',
     icon: FolderKanban,
-  },
-  {
-    title: 'Tarefas',
-    href: '/dashboard/tasks',
-    icon: CheckSquare,
-  },
-  {
-    title: 'Atividades',
-    href: '/dashboard/activities',
-    icon: Calendar,
-  },
-  {
-    title: 'Automações',
-    href: '/dashboard/automations',
-    icon: Zap,
-  },
-  {
-    title: 'Analytics',
-    href: '/dashboard/analytics',
-    icon: BarChart3,
-  },
-  {
-    title: 'Relatórios',
-    href: '/dashboard/reports',
-    icon: BarChart3,
-    permission: 'reports',
-  },
-  {
-    title: 'Configurações',
-    href: '/dashboard/settings',
-    icon: Settings,
   },
 ];
 
