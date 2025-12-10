@@ -7,6 +7,13 @@
 -- =========================================
 
 -- =====================================
+-- 0. CRIAR EXTENSÃO (NECESSÁRIO PRIMEIRO!)
+-- =====================================
+
+-- Ativar extensão pg_trgm para busca fuzzy
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+-- =====================================
 -- 1. ÍNDICES PARA CONTATOS
 -- =====================================
 
