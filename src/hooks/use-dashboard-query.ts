@@ -2,21 +2,17 @@ import { useQuery } from '@tanstack/react-query';
 
 interface DashboardMetrics {
   totalContacts: number;
-  totalConversations: number;
-  totalDeals: number;
-  totalRevenue: number;
+  activeConversations: number;
   conversionRate: number;
-  averageDealValue: number;
-  salesChart: Array<{
-    date: string;
-    value: number;
-  }>;
-  recentConversations: Array<{
-    id: string;
-    contact_name: string;
-    last_message: string;
-    unread_count: number;
-  }>;
+  newContacts: number;
+  totalSales: number;
+  trends: {
+    contacts: number;
+    conversations: number;
+    conversion: number;
+    newContacts: number;
+    sales: number;
+  };
 }
 
 type PeriodFilter = '7d' | '30d' | '90d' | 'all';
@@ -29,9 +25,10 @@ type PeriodFilter = '7d' | '30d' | '90d' | 'all';
  */
 export function useDashboardMetrics(period: PeriodFilter = '30d') {
   return useQuery({
-    queryKey: ['metrics', period],
+    queryKey: ['dashboard-metrics', period],
     queryFn: async () => {
-      const response = await fetch(`/api/dashboard/metrics?period=${period}`);
+      // Usa a rota /api/dashboard/overview que já existe
+      const response = await fetch(`/api/dashboard/overview?period=${period}`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch metrics');
