@@ -1,16 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import type { DealWithRelations } from '@/types/deal';
 
-interface PipelineStage {
-  id: string;
-  name: string;
-  color: string;
-  position: number;
-  deals: DealWithRelations[];
-  count: number;
-  totalValue: number;
-}
-
 /**
  * Hook para buscar todos os deals do pipeline
  * 
@@ -27,9 +17,26 @@ export function useDeals() {
         throw new Error('Failed to fetch deals');
       }
 
-      return response.json() as Promise<{
-        stages: PipelineStage[];
-      }>;
+      const data = await response.json() as {
+        stages: Array<{
+          id: string;
+          name: string;
+          color: string;
+          order_position: number;
+          deals: DealWithRelations[];
+          count: number;
+          total_value: number;
+        }>;
+      };
+
+      // Mapear order_position para order
+      return {
+        stages: data.stages.map(stage => ({
+          ...stage,
+          order: stage.order_position,
+          totalValue: stage.total_value
+        }))
+      };
     },
 
     // Cache por 5 minutos
