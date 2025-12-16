@@ -15,8 +15,6 @@ import { ChatWindow } from '@/components/chat/chat-window';
 import { CreateConversationDialog } from '@/components/chat/create-conversation-dialog';
 import { Card } from '@/components/ui/card';
 import { MessageCircle, AlertCircle } from 'lucide-react';
-import type { ConversationWithDetails } from '@/types/conversations';
-import type { Contact } from '@/types/contact';
 import type { Message } from '@/types/database';
 import { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
@@ -27,12 +25,11 @@ import { useContacts } from '@/hooks/use-contacts-query';
 export default function ConversationsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [sendingMessage, setSendingMessage] = useState(false);
 
   // React Query hooks com cache automático
   const { data: conversations = [], isLoading: conversationsLoading, error: conversationsError } = useConversations();
   const { data: contactsData, isLoading: contactsLoading, error: contactsError } = useContacts({ limit: 1000 });
-  const contacts = contactsData?.data || [];
+  const contacts = contactsData?.contacts || [];
 
   // Auto-select first conversation quando conversas carregam
   if (conversations.length > 0 && !selectedId) {
@@ -80,15 +77,6 @@ export default function ConversationsPage() {
     // MessageInput já enviou a mensagem para API
     // Apenas adicionar ao estado local
     setMessages((prev) => [...prev, message]);
-
-    // Update last_message_at in conversation
-    setConversations((prev) =>
-      prev.map((c) =>
-        c.id === selectedId
-          ? { ...c, last_message_at: new Date().toISOString() }
-          : c
-      )
-    );
 
     toast({
       description: 'Mensagem enviada'
@@ -157,12 +145,12 @@ export default function ConversationsPage() {
               messages={messages}
               currentUserId={currentUserId}
               onSendMessage={handleSendMessage}
-              loading={sendingMessage}
+              loading={false}
             />
           ) : (
             <div className="flex items-center justify-center h-full">
               <div className="text-center text-muted-foreground space-y-2">
-                {loading ? (
+                {conversationsLoading ? (
                   <>
                     <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto" />
                     <p>Carregando conversas...</p>
