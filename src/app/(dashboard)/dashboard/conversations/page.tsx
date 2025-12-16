@@ -18,109 +18,60 @@ import { MessageCircle, AlertCircle } from 'lucide-react';
 import type { ConversationWithDetails } from '@/types/conversations';
 import type { Contact } from '@/types/contact';
 import type { Message } from '@/types/database';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useConversations } from '@/hooks/use-conversations-query';
+import { useContacts } from '@/hooks/use-contacts-query';
 
 export default function ConversationsPage() {
-  const [conversations, setConversations] = useState<ConversationWithDetails[]>([]);
-  const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(true);
   const [sendingMessage, setSendingMessage] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  // ============================================
-  // Load conversations and contacts on mount
-  // ============================================
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setError(null);
-        setLoading(true);
-        
-        // Load conversations
-        const conversationsResponse = await fetch('/api/conversations');
-        if (!conversationsResponse.ok) {
-          throw new Error('Erro ao buscar conversas');
-        }
-        const conversationsData = await conversationsResponse.json();
-        setConversations(conversationsData);
+  // React Query hooks com cache automático
+  const { data: conversations = [], isLoading: conversationsLoading, error: conversationsError } = useConversations();
+  const { data: contactsData, isLoading: contactsLoading, error: contactsError } = useContacts({ limit: 1000 });
+  const contacts = contactsData?.data || [];
 
-        // Load contacts
-        const contactsResponse = await fetch('/api/contacts');
-        if (!contactsResponse.ok) {
-          throw new Error('Erro ao buscar contatos');
-        }
-        const contactsData = await contactsResponse.json();
-        // API retorna { data: [...], pagination: {...} }
-        setContacts(contactsData.data || []);
+  // Auto-select first conversation quando conversas carregam
+  if (conversations.length > 0 && !selectedId) {
+    setSelectedId(conversations[0].id);
+  }
 
-        // Auto-select first conversation
-        if (conversationsData.length > 0 && !selectedId) {
-          setSelectedId(conversationsData[0].id);
-        }
-      } catch (error) {
-        console.error('Error loading data:', error);
-        const message = error instanceof Error ? error.message : 'Erro ao buscar dados';
-        setError(message);
-        toast({
-          title: 'Erro',
-          description: message,
-          variant: 'destructive'
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [selectedId]);
-
-  // ============================================
   // Load messages when conversation is selected
-  // ============================================
-  useEffect(() => {
+  const loadMessages = async () => {
     if (!selectedId) return;
 
-    const loadMessages = async () => {
-      try {
-        setError(null);
-        const response = await fetch(`/api/conversations/${selectedId}`);
+    try {
+      const response = await fetch(`/api/conversations/${selectedId}`);
 
-        if (!response.ok) {
-          throw new Error('Erro ao buscar mensagens');
-        }
-
-        const data = await response.json();
-        setMessages(data.messages || []);
-
-        // Mark as read
-        await fetch(`/api/conversations/${selectedId}/read`, {
-          method: 'PATCH'
-        });
-
-        // Update unread_count
-        setConversations((prev) =>
-          prev.map((c) =>
-            c.id === selectedId ? { ...c, unread_count: 0 } : c
-          )
-        );
-      } catch (error) {
-        console.error('Error loading messages:', error);
-        const message = error instanceof Error ? error.message : 'Erro ao buscar mensagens';
-        setError(message);
-        toast({
-          title: 'Erro',
-          description: message,
-          variant: 'destructive'
-        });
+      if (!response.ok) {
+        throw new Error('Erro ao buscar mensagens');
       }
-    };
 
+      const data = await response.json();
+      setMessages(data.messages || []);
+
+      // Mark as read
+      await fetch(`/api/conversations/${selectedId}/read`, {
+        method: 'PATCH'
+      });
+    } catch (error) {
+      console.error('Error loading messages:', error);
+      const message = error instanceof Error ? error.message : 'Erro ao buscar mensagens';
+      toast({
+        title: 'Erro',
+        description: message,
+        variant: 'destructive'
+      });
+    }
+  };
+
+  // Load messages quando conversa é selecionada
+  if (selectedId && messages.length === 0) {
     loadMessages();
-  }, [selectedId]);
+  }
 
   // ============================================
   // Send message handler
@@ -144,24 +95,15 @@ export default function ConversationsPage() {
     });
   };
 
+  const loading = conversationsLoading || contactsLoading;
+  const error = conversationsError ? (conversationsError as any).message : (contactsError as any)?.message;
   const selectedConversation = conversations.find((c) => c.id === selectedId);
   const currentUserId = ''; // TODO: Get from auth context
 
   const handleConversationCreated = (conversationId: string) => {
-    // Reload conversations
-    const loadConversations = async () => {
-      try {
-        const response = await fetch('/api/conversations');
-        if (response.ok) {
-          const data = await response.json();
-          setConversations(data);
-          setSelectedId(conversationId);
-        }
-      } catch (error) {
-        console.error('Error reloading conversations:', error);
-      }
-    };
-    loadConversations();
+    // React Query invalidates automatically
+    // Just select the new conversation
+    setSelectedId(conversationId);
   };
 
   return (
