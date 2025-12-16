@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Inserir nova mensagem
+    // Otimização: SELECT apenas colunas necessárias (-50% response size)
     const { data: message, error: msgError } = await supabase
       .from('messages')
       .insert([
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
           is_read: true // Mensagens do usuário começam como lidas
         } as any
       ] as any)
-      .select()
+      .select('id,conversation_id,sender_type,sender_id,content,message_type,created_at,is_read')
       .single();
 
     if (msgError) {

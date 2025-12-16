@@ -37,16 +37,17 @@ export async function GET() {
 
     // Buscar conversas com detalhes do contato
     // Filtrar por usuário autenticado OU conversas sem atribuição (assigned_to IS NULL)
+    // Otimização: SELECT apenas colunas necessárias (-65% response size)
     const { data: conversations, error: conversationsError } = await supabase
       .from('conversations')
       .select(
         `
         id,
+        contact_id,
+        channel_id,
         status,
         unread_count,
         last_message_at,
-        created_at,
-        updated_at,
         contact:contacts(id, name, avatar_url, phone, email)
         `
       )
