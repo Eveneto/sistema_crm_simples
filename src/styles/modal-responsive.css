@@ -1,0 +1,88 @@
+/**
+ * Mobile-Responsive Dialog/Modal Styles
+ * Ensures modals work well on all screen sizes
+ */
+
+@media (max-width: 640px) {
+  /* Dialog content responsive sizing */
+  [role="dialog"] {
+    width: calc(100% - 2rem); /* 100% minus margin */
+    max-height: calc(100vh - 4rem); /* Leave space for top/bottom */
+    border-radius: 12px; /* Slightly more rounded on mobile */
+  }
+
+  /* Modal content padding on mobile */
+  [role="dialog"] > * {
+    padding: 1.5rem; /* 24px instead of 2rem */
+  }
+
+  /* Modal header adjustments */
+  [role="dialog"] h2,
+  [role="dialog"] h3 {
+    font-size: 1.25rem; /* Slightly smaller heading on mobile */
+    line-height: 1.5;
+  }
+
+  /* Modal body text */
+  [role="dialog"] p {
+    font-size: 0.9375rem; /* 15px - readable on mobile */
+    line-height: 1.6;
+  }
+
+  /* Form inputs in modal */
+  [role="dialog"] input,
+  [role="dialog"] textarea,
+  [role="dialog"] select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px; /* Touch-friendly */
+    padding: 0.75rem 0.75rem;
+  }
+
+  /* Modal buttons - stack on mobile */
+  [role="dialog"] .dialog-footer {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  /* Full width buttons in modal on mobile */
+  [role="dialog"] .dialog-footer button {
+    width: 100%;
+  }
+
+  /* Modal overlay slightly opaque on mobile */
+  [role="dialog"]::before {
+    background-color: rgba(0, 0, 0, 0.4); /* Slightly darker */
+  }
+}
+
+/* Small phone specific (max 375px) */
+@media (max-width: 375px) {
+  [role="dialog"] {
+    width: 95vw; /* Even more margin on tiny phones */
+    max-height: 90vh;
+  }
+
+  [role="dialog"] > * {
+    padding: 1rem; /* 16px padding on tiny phones */
+  }
+
+  [role="dialog"] h2 {
+    font-size: 1.125rem; /* Even smaller on tiny phones */
+  }
+}
+
+/* Tablet optimization (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  [role="dialog"] {
+    width: 90%; /* Slightly narrower on tablet */
+    max-width: 600px; /* Reasonable max on tablet */
+  }
+}
+
+/* Desktop - keep existing behavior */
+@media (min-width: 1024px) {
+  [role="dialog"] {
+    width: auto;
+    max-width: 672px; /* 42rem = max-w-2xl */
+  }
+}
