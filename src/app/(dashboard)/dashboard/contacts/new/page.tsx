@@ -36,7 +36,7 @@ export default function CreateContactPage() {
   return (
     <ModalTransition>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Criar Novo Contato</DialogTitle>
             <DialogDescription>
@@ -44,7 +44,7 @@ export default function CreateContactPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="mt-4">
+          <div className="mt-4 pr-4">
             <ContactForm mode="create" onSuccess={handleSuccess} />
           </div>
         </DialogContent>

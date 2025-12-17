@@ -111,7 +111,7 @@ export default function ContactDetailPage({ params, searchParams }: ContactDetai
   return (
     <ModalTransition>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{isEditMode ? 'Editar Contato' : 'Detalhes do Contato'}</DialogTitle>
             <DialogDescription>
@@ -121,7 +121,7 @@ export default function ContactDetailPage({ params, searchParams }: ContactDetai
             </DialogDescription>
           </DialogHeader>
 
-          <div className="mt-4">
+          <div className="mt-4 pr-4">
             {isEditMode ? (
               <ContactForm
                 mode="edit"
