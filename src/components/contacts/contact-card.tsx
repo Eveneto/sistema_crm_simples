@@ -14,14 +14,12 @@ export function ContactCard({ contact }: ContactCardProps) {
   const position = contact.custom_fields?.position;
 
   return (
-    <Card className="group relative overflow-hidden transition-all hover:shadow-md">
+    <Card className="group relative overflow-hidden card-hover transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <h3 className="font-semibold leading-none">{contact.name}</h3>
-            {position && (
-              <p className="text-sm text-muted-foreground">{position}</p>
-            )}
+            {position && <p className="text-sm text-muted-foreground">{position}</p>}
           </div>
           <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
             <Button variant="ghost" size="icon" asChild>
