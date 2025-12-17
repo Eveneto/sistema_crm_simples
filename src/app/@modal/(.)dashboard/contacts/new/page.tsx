@@ -13,9 +13,9 @@ import { ContactForm } from '@/components/contacts/contact-form';
 import { ModalTransition } from '@/components/animations/modal-transition';
 
 /**
- * Create Contact Page
- * Displays a modal dialog for creating a new contact
- * Automatically opens on page load and closes after successful submission
+ * Create Contact Modal (Interceptor Route)
+ * Shows a modal to create a new contact
+ * Automatically opens on page load
  */
 export default function CreateContactPage() {
   const router = useRouter();
@@ -23,13 +23,11 @@ export default function CreateContactPage() {
 
   const handleClose = () => {
     setIsOpen(false);
-    // Redirect back to contacts list after closing modal
     router.back();
   };
 
   const handleSuccess = () => {
     setIsOpen(false);
-    // Redirect to contacts list after successful creation
     router.push('/dashboard/contacts');
   };
 
@@ -39,9 +37,7 @@ export default function CreateContactPage() {
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Criar Novo Contato</DialogTitle>
-            <DialogDescription>
-              Preencha os dados abaixo para criar um novo contato
-            </DialogDescription>
+            <DialogDescription>Preencha os dados do novo contato abaixo</DialogDescription>
           </DialogHeader>
 
           <div className="mt-4 pr-4">

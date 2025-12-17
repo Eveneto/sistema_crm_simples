@@ -40,9 +40,9 @@ interface Contact {
 }
 
 /**
- * Contact Detail/Edit Page
- * Displays contact details in a modal
- * Allows editing when ?edit=true is in the query string
+ * Contact Detail/Edit Modal (Interceptor Route)
+ * Shows contact details or edit form in a modal
+ * Can access edit mode with ?edit=true query parameter
  */
 export default function ContactDetailPage({ params, searchParams }: ContactDetailPageProps) {
   const router = useRouter();
@@ -72,7 +72,7 @@ export default function ContactDetailPage({ params, searchParams }: ContactDetai
 
   const handleSuccess = () => {
     setIsOpen(false);
-    router.push('/dashboard/contacts');
+    router.back();
   };
 
   const handleEditClick = () => {
