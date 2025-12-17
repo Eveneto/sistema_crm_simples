@@ -1,7 +1,7 @@
 /**
  * Dashboard - Conversations Page
  * Chat interface - Lista conversas e mostra o chat selecionado
- * 
+ *
  * Layout:
  * - Header com título
  * - Grid 4 cols: 1 sidebar (conversas) + 3 chat window
@@ -21,14 +21,24 @@ import { toast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useConversations } from '@/hooks/use-conversations-query';
 import { useContacts } from '@/hooks/use-contacts-query';
+import { PageTransition } from '@/components/animations/page-transition';
+import { ErrorBoundary } from '@/components/error-boundary';
 
 export default function ConversationsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
 
   // React Query hooks com cache automático
-  const { data: conversations = [], isLoading: conversationsLoading, error: conversationsError } = useConversations();
-  const { data: contactsData, isLoading: contactsLoading, error: contactsError } = useContacts({ limit: 1000 });
+  const {
+    data: conversations = [],
+    isLoading: conversationsLoading,
+    error: conversationsError,
+  } = useConversations();
+  const {
+    data: contactsData,
+    isLoading: contactsLoading,
+    error: contactsError,
+  } = useContacts({ limit: 1000 });
   const contacts = contactsData?.contacts || [];
 
   // Auto-select first conversation quando conversas carregam
@@ -52,15 +62,16 @@ export default function ConversationsPage() {
 
       // Mark as read
       await fetch(`/api/conversations/${selectedId}/read`, {
-        method: 'PATCH'
+        method: 'PATCH',
       });
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error loading messages:', error);
       const message = error instanceof Error ? error.message : 'Erro ao buscar mensagens';
       toast({
         title: 'Erro',
         description: message,
-        variant: 'destructive'
+        variant: 'destructive',
       });
     }
   };
@@ -79,12 +90,14 @@ export default function ConversationsPage() {
     setMessages((prev) => [...prev, message]);
 
     toast({
-      description: 'Mensagem enviada'
+      description: 'Mensagem enviada',
     });
   };
 
   const loading = conversationsLoading || contactsLoading;
-  const error = conversationsError ? (conversationsError as any).message : (contactsError as any)?.message;
+  const error = conversationsError
+    ? (conversationsError as Error).message
+    : (contactsError as Error)?.message;
   const selectedConversation = conversations.find((c) => c.id === selectedId);
   const currentUserId = ''; // TODO: Get from auth context
 
@@ -95,77 +108,81 @@ export default function ConversationsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 h-full">
-      {/* ============================================ */}
-      {/* Header */}
-      {/* ============================================ */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <MessageCircle className="h-8 w-8 text-primary" />
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Conversas</h1>
-            <p className="text-muted-foreground">Comunique-se com seus contatos</p>
-          </div>
-        </div>
-        <CreateConversationDialog 
-          contacts={contacts}
-          onConversationCreated={handleConversationCreated}
-        />
-      </div>
-
-      {/* ============================================ */}
-      {/* Error Alert */}
-      {/* ============================================ */}
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* ============================================ */}
-      {/* Chat Layout */}
-      {/* ============================================ */}
-      <div className="grid grid-cols-4 gap-4 flex-1">
-        {/* Sidebar - Conversations List */}
-        <Card className="col-span-1 overflow-hidden">
-          <ConversationList
-            conversations={conversations}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            loading={loading}
-          />
-        </Card>
-
-        {/* Main - Chat Window */}
-        <Card className="col-span-3 overflow-hidden">
-          {selectedConversation ? (
-            <ChatWindow
-              conversation={selectedConversation}
-              messages={messages}
-              currentUserId={currentUserId}
-              onSendMessage={handleSendMessage}
-              loading={false}
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center text-muted-foreground space-y-2">
-                {conversationsLoading ? (
-                  <>
-                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto" />
-                    <p>Carregando conversas...</p>
-                  </>
-                ) : (
-                  <>
-                    <MessageCircle className="h-12 w-12 mx-auto opacity-20" />
-                    <p>Selecione uma conversa para começar</p>
-                  </>
-                )}
+    <PageTransition>
+      <ErrorBoundary sectionName="Conversas">
+        <div className="flex flex-col gap-6 h-full">
+          {/* ============================================ */}
+          {/* Header */}
+          {/* ============================================ */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <MessageCircle className="h-8 w-8 text-primary" />
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight">Conversas</h1>
+                <p className="text-muted-foreground">Comunique-se com seus contatos</p>
               </div>
             </div>
+            <CreateConversationDialog
+              contacts={contacts}
+              onConversationCreated={handleConversationCreated}
+            />
+          </div>
+
+          {/* ============================================ */}
+          {/* Error Alert */}
+          {/* ============================================ */}
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
-        </Card>
-      </div>
-    </div>
+
+          {/* ============================================ */}
+          {/* Chat Layout */}
+          {/* ============================================ */}
+          <div className="grid grid-cols-4 gap-4 flex-1">
+            {/* Sidebar - Conversations List */}
+            <Card className="col-span-1 overflow-hidden">
+              <ConversationList
+                conversations={conversations}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                loading={loading}
+              />
+            </Card>
+
+            {/* Main - Chat Window */}
+            <Card className="col-span-3 overflow-hidden">
+              {selectedConversation ? (
+                <ChatWindow
+                  conversation={selectedConversation}
+                  messages={messages}
+                  currentUserId={currentUserId}
+                  onSendMessage={handleSendMessage}
+                  loading={false}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center text-muted-foreground space-y-2">
+                    {conversationsLoading ? (
+                      <>
+                        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto" />
+                        <p>Carregando conversas...</p>
+                      </>
+                    ) : (
+                      <>
+                        <MessageCircle className="h-12 w-12 mx-auto opacity-20" />
+                        <p>Selecione uma conversa para começar</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            </Card>
+          </div>
+        </div>
+      </ErrorBoundary>
+    </PageTransition>
   );
 }

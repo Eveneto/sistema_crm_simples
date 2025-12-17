@@ -18,6 +18,8 @@ import { PlusCircle } from 'lucide-react';
 import type { DealWithRelations } from '@/types/deal';
 import { useDeals } from '@/hooks/use-deals-query';
 import { useQueryClient } from '@tanstack/react-query';
+import { PageTransition } from '@/components/animations/page-transition';
+import { ErrorBoundary } from '@/components/error-boundary';
 
 export default function PipelinePage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -26,7 +28,7 @@ export default function PipelinePage() {
 
   // React Query hook com cache automático
   const { data: pipelineData, isLoading } = useDeals();
-  
+
   // Extrair stages do response
   const stages = pipelineData?.stages || [];
 
@@ -45,43 +47,41 @@ export default function PipelinePage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b">
-        <div>
-          <h1 className="text-2xl font-bold">Pipeline de Vendas</h1>
-          <p className="text-sm text-muted-foreground">
-            Visualize e gerencie seus negócios
-          </p>
+    <PageTransition>
+      <ErrorBoundary sectionName="Pipeline de Vendas">
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b">
+            <div>
+              <h1 className="text-2xl font-bold">Pipeline de Vendas</h1>
+              <p className="text-sm text-muted-foreground">Visualize e gerencie seus negócios</p>
+            </div>
+
+            <Button onClick={() => setIsCreateModalOpen(true)}>
+              <PlusCircle className="w-4 h-4 mr-2" />
+              Novo Negócio
+            </Button>
+          </div>
+
+          {/* Pipeline Board */}
+          {isLoading ? <PipelineSkeleton /> : <PipelineBoard stages={stages} onEdit={handleEdit} />}
+
+          {/* Modal Criar Negócio */}
+          <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Criar Novo Negócio</DialogTitle>
+              </DialogHeader>
+              <DealForm
+                mode="create"
+                stages={stages}
+                onSuccess={handleSuccess}
+                onCancel={handleCancel}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
-
-        <Button onClick={() => setIsCreateModalOpen(true)}>
-          <PlusCircle className="w-4 h-4 mr-2" />
-          Novo Negócio
-        </Button>
-      </div>
-
-      {/* Pipeline Board */}
-      {isLoading ? (
-        <PipelineSkeleton />
-      ) : (
-        <PipelineBoard stages={stages} onEdit={handleEdit} />
-      )}
-
-      {/* Modal Criar Negócio */}
-      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Criar Novo Negócio</DialogTitle>
-          </DialogHeader>
-          <DealForm
-            mode="create"
-            stages={stages}
-            onSuccess={handleSuccess}
-            onCancel={handleCancel}
-          />
-        </DialogContent>
-      </Dialog>
-    </div>
+      </ErrorBoundary>
+    </PageTransition>
   );
 }
