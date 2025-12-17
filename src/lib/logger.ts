@@ -3,50 +3,57 @@
  *
  * - Development: Console com cores e detalhes
  * - Production: Apenas erros críticos (preparado para Sentry/LogRocket)
+ * 
+ * Nota: Convertido para um objeto plain (não classe) para evitar issues
+ * com serialização Server->Client Components no Next.js
  */
 
 interface LogContext {
   [key: string]: unknown; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
-class Logger {
-  private isDevelopment = process.env.NODE_ENV === 'development';
+const isDevelopment = process.env.NODE_ENV === 'development';
 
+/**
+ * Logger - Plain object implementation
+ * Evita problemas de serialização com Next.js 14
+ */
+export const logger = {
   /**
    * Log de debug (apenas em desenvolvimento)
    */
   debug(message: string, context?: LogContext) {
-    if (this.isDevelopment) {
+    if (isDevelopment) {
       // eslint-disable-next-line no-console
       console.log('🔍 [DEBUG]', message, context || '');
     }
-  }
+  },
 
   /**
    * Log informativo (apenas em desenvolvimento)
    */
   info(message: string, context?: LogContext) {
-    if (this.isDevelopment) {
+    if (isDevelopment) {
       // eslint-disable-next-line no-console
       console.info('ℹ️ [INFO]', message, context || '');
     }
-  }
+  },
 
   /**
    * Log de aviso (apenas em desenvolvimento)
    */
   warn(message: string, context?: LogContext) {
-    if (this.isDevelopment) {
+    if (isDevelopment) {
       // eslint-disable-next-line no-console
       console.warn('⚠️ [WARN]', message, context || '');
     }
-  }
+  },
 
   /**
    * Log de erro (sempre registra, mas protege detalhes em produção)
    */
   error(message: string, context?: LogContext) {
-    if (this.isDevelopment) {
+    if (isDevelopment) {
       // eslint-disable-next-line no-console
       console.error('❌ [ERROR]', message, context || '');
     } else {
@@ -58,7 +65,7 @@ class Logger {
       // Sentry.captureException(new Error(message), { extra: context });
       // LogRocket.captureException(new Error(message), { extra: context });
     }
-  }
+  },
 
   /**
    * Log de erro crítico (sempre registra)
@@ -68,7 +75,5 @@ class Logger {
     console.error('🚨 [CRITICAL]', message, context || '');
 
     // TODO: Alertar equipe (Slack, PagerDuty, etc)
-  }
-}
-
-export const logger = new Logger();
+  },
+};

@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/providers/theme-provider';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '@/lib/react-query';
+import { QueryProvider } from '@/components/providers/query-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={inter.className}>
-        <QueryClientProvider client={queryClient}>
+        <QueryProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -29,7 +28,7 @@ export default function RootLayout({
           >
             {children}
           </ThemeProvider>
-        </QueryClientProvider>
+        </QueryProvider>
       </body>
     </html>
   );

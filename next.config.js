@@ -25,6 +25,12 @@ const nextConfig = {
   },
   compress: true,
   productionBrowserSourceMaps: false,
+  // Disable static page generation for authenticated routes
+  staticPageGenerationTimeout: 120,
+  onDemandEntries: {
+    maxInactiveAge: 60 * 1000,
+    pagesBufferLength: 5,
+  },
   // Ignorar pasta evolution-api durante o build
   webpack: (config, { isServer }) => {
     config.watchOptions = {

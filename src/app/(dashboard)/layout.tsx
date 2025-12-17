@@ -6,6 +6,10 @@ import { Header } from '@/components/layout/header';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 
+// Disable static generation for auth-required pages
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Dashboard - CRM Simplificado',
   description: 'Sistema de CRM para gestão de clientes e vendas',
