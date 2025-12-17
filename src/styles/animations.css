@@ -260,3 +260,200 @@
 .transition-fast {
   transition: all 150ms ease-in-out;
 }
+
+/* ========================================
+   Mobile Responsiveness & Touch Optimization
+   ======================================== */
+
+/* Disable hover effects on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  /* Remove hover shadow on touch */
+  .card-hover:hover {
+    box-shadow: none;
+    transform: none;
+  }
+
+  /* Enhanced active state for touch */
+  .card-hover:active {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: scale(0.98);
+    transition: all 150ms ease-out;
+  }
+
+  /* Faster modal animation on mobile */
+  .modal-transition-wrapper {
+    animation: modal-scale-in 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Reduce page transition duration */
+  .fade-in {
+    animation: fade-in 200ms ease-in-out forwards;
+  }
+
+  /* Disable double-tap zoom on interactive elements */
+  button,
+  a,
+  input,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+}
+
+/* Tablet optimization (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) and (hover: none) {
+  /* Slightly faster animations on tablet */
+  .modal-transition-wrapper {
+    animation: modal-scale-in 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+/* Small phone optimization (max 375px) */
+@media (max-width: 375px) {
+  /* Faster page transitions on smallest phones */
+  .fade-in {
+    animation: fade-in 150ms ease-in-out forwards;
+  }
+
+  /* Ripple effect slightly faster on small screens */
+  .button-ripple:active::after {
+    animation: ripple 0.5s ease-out;
+  }
+
+  /* Tighter modal animation */
+  .modal-transition-wrapper {
+    animation: modal-scale-in 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable ripple completely if motion is reduced */
+  .button-ripple:active::after {
+    animation: none;
+  }
+
+  /* Instant modal entrance */
+  .modal-transition-wrapper {
+    animation: none;
+  }
+}
+
+/* Touch-friendly button sizing */
+@media (max-width: 768px) {
+  /* Ensure minimum touch target of 44px */
+  button[size="icon"],
+  [role="button"][data-size="icon"] {
+    min-width: 48px;
+    min-height: 48px;
+  }
+
+  /* Increase padding on small buttons for touch */
+  button[size="sm"] {
+    min-height: 40px;
+  }
+}
+
+/* Improve ripple visibility on different button variants */
+/* Light backgrounds need darker ripple */
+.button-ripple[variant="outline"]::after,
+.button-ripple[variant="ghost"]::after {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+/* Keep white ripple for dark buttons */
+.button-ripple[variant="default"]::after,
+.button-ripple[variant="destructive"]::after {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Secondary variant */
+.button-ripple[variant="secondary"]::after {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ========================================
+   Dialog/Modal Responsive Styles
+   ======================================== */
+
+/* Mobile-first dialog sizing */
+@media (max-width: 640px) {
+  /* Dialog content responsive sizing */
+  [role="dialog"] {
+    width: calc(100% - 2rem);
+    max-height: calc(100vh - 4rem);
+    border-radius: 12px;
+  }
+
+  /* Modal content padding on mobile */
+  [role="dialog"] > * {
+    padding: 1.5rem;
+  }
+
+  /* Modal header adjustments */
+  [role="dialog"] h2,
+  [role="dialog"] h3 {
+    font-size: 1.25rem;
+    line-height: 1.5;
+  }
+
+  /* Modal body text */
+  [role="dialog"] p {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  /* Form inputs in modal - prevent iOS zoom */
+  [role="dialog"] input,
+  [role="dialog"] textarea,
+  [role="dialog"] select {
+    font-size: 16px;
+    min-height: 44px;
+    padding: 0.75rem;
+  }
+
+  /* Modal buttons - stack on mobile */
+  [role="dialog"] [role="dialog-footer"],
+  [role="dialog"] .dialog-footer {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  /* Full width buttons in modal on mobile */
+  [role="dialog"] button,
+  [role="dialog"] [role="button"] {
+    width: 100%;
+  }
+}
+
+/* Small phone specific (max 375px) */
+@media (max-width: 375px) {
+  [role="dialog"] {
+    width: 95vw;
+    max-height: 90vh;
+  }
+
+  [role="dialog"] > * {
+    padding: 1rem;
+  }
+
+  [role="dialog"] h2 {
+    font-size: 1.125rem;
+  }
+}
+
+/* Tablet optimization (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  [role="dialog"] {
+    width: 90%;
+    max-width: 600px;
+  }
+}
