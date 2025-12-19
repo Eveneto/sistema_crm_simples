@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { ReactNode } from 'react';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
