@@ -1,11 +1,11 @@
-import { createClient } from '@/lib/supabase/server'
-import { NextRequest, NextResponse } from 'next/server'
-import { createDealSchema } from '@/lib/validations/deal'
+import { createClient } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { createDealSchema } from '@/lib/validations/deal';
 
 /**
  * GET /api/deals
  * Lista negócios ou retorna visão de pipeline
- * 
+ *
  * Query params:
  * - view=pipeline: retorna dados agregados por estágio
  * - status: filtra por status
@@ -14,26 +14,26 @@ import { createDealSchema } from '@/lib/validations/deal'
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    
-    const searchParams = request.nextUrl.searchParams
-    const isTest = searchParams.get('test') === 'true'
-    
+    const supabase = await createClient();
+
+    const searchParams = request.nextUrl.searchParams;
+    const isTest = searchParams.get('test') === 'true';
+
     // Verifica autenticação (exceto em modo teste)
     if (!isTest) {
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
       if (authError || !user) {
-        return NextResponse.json(
-          { error: 'Não autenticado' },
-          { status: 401 }
-        )
+        return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
       }
     }
 
-    const view = searchParams.get('view')
-    const status = searchParams.get('status')
-    const stageId = searchParams.get('stage_id')
-    const contactId = searchParams.get('contact_id')
+    const view = searchParams.get('view');
+    const status = searchParams.get('status');
+    const stageId = searchParams.get('stage_id');
+    const contactId = searchParams.get('contact_id');
 
     // Visão de pipeline: retorna estágios com deals agregados
     if (view === 'pipeline') {
@@ -41,56 +41,53 @@ export async function GET(request: NextRequest) {
       const { data: stages, error: stagesError } = await supabase
         .from('deal_stages')
         .select('*')
-        .order('position', { ascending: true })
+        .order('position', { ascending: true });
 
       if (stagesError) {
-        console.error('Error fetching stages:', stagesError)
-        return NextResponse.json(
-          { error: 'Erro ao buscar estágios' },
-          { status: 500 }
-        )
+        console.error('Error fetching stages:', stagesError);
+        return NextResponse.json({ error: 'Erro ao buscar estágios' }, { status: 500 });
       }
 
       // Busca todos os deals ativos
       // Otimização: SELECT apenas colunas necessárias (-50% response size)
       let dealsQuery = supabase
         .from('deals')
-        .select(`
+        .select(
+          `
           id,title,value,stage_id,contact_id,assigned_to,position,status,created_at,
           contact:contacts(id, name, email),
           stage:deal_stages(id, name, color)
-        `)
+        `
+        )
         .neq('status', 'archived')
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false });
 
       if (status) {
-        dealsQuery = dealsQuery.eq('status', status)
+        dealsQuery = dealsQuery.eq('status', status);
       }
       if (contactId) {
-        dealsQuery = dealsQuery.eq('contact_id', contactId)
+        dealsQuery = dealsQuery.eq('contact_id', contactId);
       }
 
-      const { data: deals, error: dealsError } = await dealsQuery
+      const { data: deals, error: dealsError } = await dealsQuery;
 
       if (dealsError) {
-        console.error('Error fetching deals:', dealsError)
-        return NextResponse.json(
-          { error: 'Erro ao buscar negócios' },
-          { status: 500 }
-        )
+        console.error('Error fetching deals:', dealsError);
+        return NextResponse.json({ error: 'Erro ao buscar negócios' }, { status: 500 });
       }
 
       // Agrupa deals por estágio
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const pipelineData = (stages as any[]).map((stage: any) => {
-        const stageDeals = (deals as any[]).filter(
-          (deal: any) => deal.stage_id === stage.id
-        )
-        
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const stageDeals = (deals as any[]).filter((deal: any) => deal.stage_id === stage.id);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const totalValue = stageDeals.reduce(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (sum: number, deal: any) => sum + (Number(deal.value) || 0),
           0
-        )
+        );
 
         return {
           id: stage.id,
@@ -99,59 +96,54 @@ export async function GET(request: NextRequest) {
           order_position: stage.order_position,
           deals: stageDeals,
           count: stageDeals.length,
-          total_value: totalValue
-        }
-      })
+          total_value: totalValue,
+        };
+      });
 
       return NextResponse.json({
         stages: pipelineData,
-        total_deals: deals?.length || 0
-      })
+        total_deals: deals?.length || 0,
+      });
     }
 
     // Visão lista: retorna deals com filtros
     // Otimização: SELECT apenas colunas necessárias (-50% response size)
     let query = supabase
       .from('deals')
-      .select(`
+      .select(
+        `
         id,title,value,stage_id,contact_id,assigned_to,position,status,created_at,
         contact:contacts(id, name, email),
         stage:deal_stages(id, name, color)
-      `)
+      `
+      )
       .neq('status', 'archived')
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false });
 
     if (status) {
-      query = query.eq('status', status)
+      query = query.eq('status', status);
     }
     if (stageId) {
-      query = query.eq('stage_id', stageId)
+      query = query.eq('stage_id', stageId);
     }
     if (contactId) {
-      query = query.eq('contact_id', contactId)
+      query = query.eq('contact_id', contactId);
     }
 
-    const { data: deals, error } = await query
+    const { data: deals, error } = await query;
 
     if (error) {
-      console.error('Error fetching deals:', error)
-      return NextResponse.json(
-        { error: 'Erro ao buscar negócios' },
-        { status: 500 }
-      )
+      console.error('Error fetching deals:', error);
+      return NextResponse.json({ error: 'Erro ao buscar negócios' }, { status: 500 });
     }
 
     return NextResponse.json({
       deals: deals || [],
-      count: deals?.length || 0
-    })
-
+      count: deals?.length || 0,
+    });
   } catch (error) {
-    console.error('Unexpected error in GET /api/deals:', error)
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    )
+    console.error('Unexpected error in GET /api/deals:', error);
+    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
   }
 }
 
@@ -161,32 +153,32 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    
+    const supabase = await createClient();
+
     // Verifica autenticação
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
-    const body = await request.json()
+    const body = await request.json();
 
     // Valida dados de entrada
-    const validationResult = createDealSchema.safeParse(body)
+    const validationResult = createDealSchema.safeParse(body);
     if (!validationResult.success) {
       return NextResponse.json(
-        { 
+        {
           error: 'Dados inválidos',
-          details: validationResult.error.issues
+          details: validationResult.error.issues,
         },
         { status: 400 }
-      )
+      );
     }
 
-    const dealData = validationResult.data
+    const dealData = validationResult.data;
 
     // Cria o negócio
     // Otimização: SELECT apenas colunas necessárias no retorno
@@ -201,33 +193,26 @@ export async function POST(request: NextRequest) {
         user_id: user.id,
         status: 'active',
         expected_close_date: dealData.expected_close_date,
-        description: dealData.description
+        description: dealData.description,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any)
-      .select(`
+      .select(
+        `
         id,title,value,stage_id,contact_id,assigned_to,position,status,created_at,
         contact:contacts(id, name, email),
         stage:deal_stages(id, name, color)
-      `)
-      .single()
+      `
+      )
+      .single();
 
     if (error) {
-      console.error('Error creating deal:', error)
-      return NextResponse.json(
-        { error: 'Erro ao criar negócio' },
-        { status: 500 }
-      )
+      console.error('Error creating deal:', error);
+      return NextResponse.json({ error: 'Erro ao criar negócio' }, { status: 500 });
     }
 
-    return NextResponse.json(
-      { deal },
-      { status: 201 }
-    )
-
+    return NextResponse.json({ deal }, { status: 201 });
   } catch (error) {
-    console.error('Unexpected error in POST /api/deals:', error)
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    )
+    console.error('Unexpected error in POST /api/deals:', error);
+    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
   }
 }

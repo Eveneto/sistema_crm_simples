@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     // Verifica autenticação
     const {
       data: { user },
-      error: authError
+      error: authError,
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     // Parse e valida o corpo da requisição
     const body = await request.json();
     console.log('[DEBUG] Creating message with body:', body);
-    
+
     const validated = createMessageSchema.parse(body);
     console.log('[DEBUG] Validation passed:', validated);
 
@@ -37,15 +37,12 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (convError || !conversation) {
-      console.log('[DEBUG] Conversation not found:', { 
-        conversation_id: validated.conversation_id, 
+      console.log('[DEBUG] Conversation not found:', {
+        conversation_id: validated.conversation_id,
         user_id: user.id,
-        error: convError 
+        error: convError,
       });
-      return NextResponse.json(
-        { error: 'Conversa não encontrada' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Conversa não encontrada' }, { status: 404 });
     }
 
     // Inserir nova mensagem
@@ -59,10 +56,10 @@ export async function POST(request: NextRequest) {
           sender_id: user.id,
           content: validated.content,
           message_type: 'text',
-          is_read: true // Mensagens do usuário começam como lidas
+          is_read: true, // Mensagens do usuário começam como lidas
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ] as any)
       .select('id,conversation_id,sender_type,sender_id,content,message_type,created_at,is_read')
       .single();
@@ -75,34 +72,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(message, { status: 201 });
   } catch (error) {
     if (error instanceof SyntaxError) {
-      return NextResponse.json(
-        { error: 'JSON inválido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'JSON inválido' }, { status: 400 });
     }
 
     // Validação do Zod
-    if (
-      error &&
-      typeof error === 'object' &&
-      'issues' in error
-    ) {
+    if (error && typeof error === 'object' && 'issues' in error) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const zodError = error as any;
       console.error('[DEBUG] Validation error:', zodError.issues);
       return NextResponse.json(
         {
           error: 'Validação falhou',
-          issues: zodError.issues
+          issues: zodError.issues,
         },
         { status: 400 }
       );
     }
 
     console.error('POST /api/messages error:', error);
-    return NextResponse.json(
-      { error: 'Erro ao enviar mensagem' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erro ao enviar mensagem' }, { status: 500 });
   }
 }

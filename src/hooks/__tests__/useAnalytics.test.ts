@@ -1,7 +1,7 @@
 /**
  * Analytics Hooks Tests
  * Testes unitários para custom hooks do módulo de analytics
- * 
+ *
  * Seguindo Clean Code:
  * - Testa comportamento, não implementação
  * - Usa React Testing Library
@@ -104,12 +104,11 @@ describe('useRevenueData', () => {
     // Arrange
     const mockData30d = { realized: { current: 100000 } };
     const mockData90d = { realized: { current: 300000 } };
-    
+
     mockFetch(mockData30d);
-    const { result, rerender } = renderHook(
-      ({ period }) => useRevenueData({ period }),
-      { initialProps: { period: '30d' as const } }
-    );
+    const { result, rerender } = renderHook(({ period }) => useRevenueData({ period }), {
+      initialProps: { period: '30d' as const },
+    });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -334,7 +333,7 @@ describe('useAllAnalytics', () => {
 
   it('deve indicar loading enquanto qualquer dado está carregando', async () => {
     // Arrange
-    const delayedPromise = new Promise((resolve) => 
+    const delayedPromise = new Promise((resolve) =>
       setTimeout(() => resolve({ ok: true, json: async () => ({}) }), 100)
     );
     (global.fetch as jest.Mock).mockReturnValue(delayedPromise);
@@ -345,9 +344,12 @@ describe('useAllAnalytics', () => {
     // Assert - deve estar loading inicialmente
     expect(result.current.isAnyLoading).toBe(true);
 
-    await waitFor(() => {
-      expect(result.current.isAnyLoading).toBe(false);
-    }, { timeout: 200 });
+    await waitFor(
+      () => {
+        expect(result.current.isAnyLoading).toBe(false);
+      },
+      { timeout: 200 }
+    );
   });
 
   it('deve indicar erro se algum fetch falhar', async () => {

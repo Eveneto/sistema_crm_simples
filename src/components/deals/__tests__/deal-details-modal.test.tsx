@@ -17,7 +17,7 @@ jest.mock('date-fns/locale/pt-BR', () => ({}));
 // Mock dos componentes UI
 jest.mock('@/components/ui/dialog', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Dialog: ({ children, open }: any) => open ? <div data-testid="dialog">{children}</div> : null,
+  Dialog: ({ children, open }: any) => (open ? <div data-testid="dialog">{children}</div> : null),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   DialogContent: ({ children }: any) => <div data-testid="dialog-content">{children}</div>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

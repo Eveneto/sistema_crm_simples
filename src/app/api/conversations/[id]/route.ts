@@ -6,17 +6,14 @@ import { NextRequest, NextResponse } from 'next/server';
  * Busca uma conversa específica com todas as suas mensagens
  * Retorna: conversa + array de mensagens paginado
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = await createClient();
 
     // Verifica autenticação
     const {
       data: { user },
-      error: authError
+      error: authError,
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
@@ -44,10 +41,7 @@ export async function GET(
 
     if (convError) {
       if (convError.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Conversa não encontrada' },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: 'Conversa não encontrada' }, { status: 404 });
       }
       throw convError;
     }
@@ -68,14 +62,11 @@ export async function GET(
 
     return NextResponse.json({
       conversation,
-      messages: messages || []
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      messages: messages || [],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
   } catch (error) {
     console.error('GET /api/conversations/[id] error:', error);
-    return NextResponse.json(
-      { error: 'Erro ao buscar conversa' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erro ao buscar conversa' }, { status: 500 });
   }
 }
