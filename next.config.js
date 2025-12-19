@@ -37,20 +37,6 @@ const nextConfig = {
     };
     return config;
   },
-  // Skip static generation for auth pages
-  trailingSlash: false,
-};
-    maxInactiveAge: 60 * 1000,
-    pagesBufferLength: 5,
-  },
-  // Ignorar pasta evolution-api durante o build
-  webpack: (config, { isServer }) => {
-    config.watchOptions = {
-      ...config.watchOptions,
-      ignored: ['**/node_modules', '**/evolution-api/**'],
-    };
-    return config;
-  },
 };
 
 module.exports = nextConfig;
