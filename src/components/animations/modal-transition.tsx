@@ -1,26 +1,25 @@
 'use client';
 
-import { ReactNode } from 'react';
+import React from 'react';
 
 interface ModalTransitionProps {
-  isOpen: boolean;
-  children: ReactNode;
+  children: React.ReactNode;
+  isOpen?: boolean;
 }
 
-/**
- * ModalTransition Component
- * Wraps modal/dialog content with entrance animations
- *
- * Features:
- * - Scale-in animation from center (300ms)
- * - Backdrop fade-in synchronized with modal
- * - Smooth exit animation on close
- * - GPU-accelerated (no JavaScript animation overhead)
- */
-export function ModalTransition({ isOpen, children }: ModalTransitionProps) {
+export const ModalTransition: React.FC<ModalTransitionProps> = ({ children, isOpen = true }) => {
   if (!isOpen) return null;
 
-  return <div className="modal-transition-wrapper">{children}</div>;
-}
+  return (
+    <div
+      className="animate-in fade-in zoom-in-95"
+      style={{
+        animation: `fadeInScale 0.3s ease-out`,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
 
 export default ModalTransition;

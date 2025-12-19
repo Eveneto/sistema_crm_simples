@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* @ts-nocheck */
 /**
  * Analytics Service
  * Camada de serviço para analytics (Data Layer)
- * 
+ *
  * Seguindo Clean Code:
  * - Single Responsibility Principle
  * - Funções pequenas (≤ 20 linhas)
@@ -26,6 +25,18 @@ import type {
   MonthlyTrend,
   DateRange,
 } from '@/types/analytics';
+
+// Type definitions for deals
+interface Deal {
+  value: number;
+  closed_at?: string | null;
+  probability?: number;
+  expected_close_date?: string | null;
+  stage?: string | null;
+  status?: string;
+  user_id?: string;
+  created_at?: string;
+}
 
 // ============================================
 // Date Utilities (DRY principle)
@@ -100,7 +111,7 @@ export async function fetchRealizedRevenue(
 
   // Agrupar por mês
   const monthlyData = new Map<string, number>();
-  deals?.forEach((deal: unknown) => {
+  deals?.forEach((deal: Deal) => {
     if (!deal.closed_at) return;
 
     const month = formatMonthKey(new Date(deal.closed_at));
@@ -133,7 +144,7 @@ export async function fetchExpectedRevenue(
   const monthlyData = new Map<string, number>();
   let total = 0;
 
-  deals?.forEach((deal: unknown) => {
+  deals?.forEach((deal: Deal) => {
     if (!deal.expected_close_date) return;
 
     const expectedValue = (deal.value || 0) * ((deal.probability || 0) / 100);
@@ -204,7 +215,8 @@ export async function buildPipelineDistribution(
   let totalValue = 0;
   let totalCount = 0;
 
-  deals?.forEach((deal: unknown) => {
+  deals?.forEach((deal: Deal) => {
+    if (!deal.stage) return;
     const stage = stageMap.get(deal.stage) || { value: 0, count: 0 };
     stage.value += deal.value || 0;
     stage.count += 1;
@@ -215,10 +227,11 @@ export async function buildPipelineDistribution(
   });
 
   const byValue: PipelineStageDistribution[] =
-    stages?.map((stage: unknown) => {
-      const data = stageMap.get(stage.id) || { value: 0, count: 0 };
+    stages?.map((stage: any) => {
+      const stageId = stage.id || '';
+      const data = stageMap.get(stageId) || { value: 0, count: 0 };
       return {
-        stage: stage.id,
+        stage: stageId,
         stageName: stage.name,
         value: data.value,
         count: data.count,
@@ -228,10 +241,11 @@ export async function buildPipelineDistribution(
     }) || [];
 
   const byCount: PipelineStageDistribution[] =
-    stages?.map((stage: unknown) => {
-      const data = stageMap.get(stage.id) || { value: 0, count: 0 };
+    stages?.map((stage: any) => {
+      const stageId = stage.id || '';
+      const data = stageMap.get(stageId) || { value: 0, count: 0 };
       return {
-        stage: stage.id,
+        stage: stageId,
         stageName: stage.name,
         value: data.value,
         count: data.count,
@@ -313,8 +327,8 @@ export async function calculateSalesCycle(
 
   if (!deals || deals.length === 0) return 0;
 
-  const cycles = deals.map((deal: unknown) => {
-    const created = new Date(deal.created_at);
+  const cycles = deals.map((deal: Deal) => {
+    const created = new Date(deal.created_at || new Date());
     const closed = new Date(deal.closed_at!);
     return Math.floor((closed.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
   });
@@ -396,7 +410,7 @@ export async function buildForecast(
   let totalValue = 0;
   const count = deals?.length || 0;
 
-  deals?.forEach((deal: unknown) => {
+  deals?.forEach((deal: Deal) => {
     if (!deal.expected_close_date) return;
 
     const expectedValue = (deal.value || 0) * ((deal.probability || 0) / 100);
@@ -416,11 +430,7 @@ export async function buildForecast(
     .sort((a, b) => a.month.localeCompare(b.month));
 
   // Calcular confidence baseado em histórico
-  const averageCloseRate = await calculateWinRate(
-    supabase,
-    userId,
-    calculateDateRange('90d')
-  );
+  const averageCloseRate = await calculateWinRate(supabase, userId, calculateDateRange('90d'));
 
   return {
     forecast,
@@ -457,7 +467,13 @@ export async function buildTrendsData(
 
   const monthlyData = new Map<string, { revenue: number; deals: number }>();
 
-  deals?.forEach((deal: unknown) => {
+  // Type assertion for deals
+  const typedDeals = deals as Array<{
+    closed_at: string;
+    value: number;
+  }>;
+
+  typedDeals?.forEach((deal) => {
     if (!deal.closed_at) return;
 
     const month = formatMonthKey(new Date(deal.closed_at));
@@ -467,9 +483,7 @@ export async function buildTrendsData(
     monthlyData.set(month, data);
   });
 
-  const sortedMonths = Array.from(monthlyData.entries()).sort((a, b) =>
-    a[0].localeCompare(b[0])
-  );
+  const sortedMonths = Array.from(monthlyData.entries()).sort((a, b) => a[0].localeCompare(b[0]));
 
   const monthOverMonth: MonthlyTrend[] = sortedMonths.map(([month, data], index) => {
     const previous = index > 0 ? sortedMonths[index - 1][1] : { revenue: 0, deals: 0 };
@@ -488,9 +502,9 @@ export async function buildTrendsData(
   // Calcular year over year (simplificado)
   const currentYear = new Date().getFullYear();
   const currentYearRevenue =
-    deals
-      ?.filter((d: unknown) => new Date(d.closed_at!).getFullYear() === currentYear)
-      .reduce((sum: number, d: unknown) => sum + (d.value || 0), 0) || 0;
+    typedDeals
+      ?.filter((d) => new Date(d.closed_at!).getFullYear() === currentYear)
+      .reduce((sum: number, d) => sum + (d.value || 0), 0) || 0;
 
   return {
     monthOverMonth,

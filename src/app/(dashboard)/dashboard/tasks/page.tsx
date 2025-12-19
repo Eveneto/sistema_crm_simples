@@ -8,8 +8,6 @@ import { TaskFilters } from '@/components/tasks/task-filters';
 import { Button } from '@/components/ui/button';
 import { ExportButton } from '@/components/export/export-button';
 import { Plus } from 'lucide-react';
-import { PageTransition } from '@/components/animations/page-transition';
-import { ErrorBoundary } from '@/components/error-boundary';
 
 export default function TasksPage() {
   const router = useRouter();
@@ -28,33 +26,29 @@ export default function TasksPage() {
   };
 
   return (
-    <PageTransition>
-      <ErrorBoundary sectionName="Tarefas">
-        <div className="container mx-auto py-8 space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold">Tarefas</h1>
-              <p className="text-muted-foreground mt-1">Gerencie suas tarefas e lembretes</p>
-            </div>
-            <div className="flex gap-2">
-              <ExportButton
-                endpoint="/api/export/tasks"
-                filename="tarefas"
-                label="Exportar"
-                variant="outline"
-              />
-              <Button onClick={() => router.push('/dashboard/tasks/new')}>
-                <Plus className="h-4 w-4 mr-2" />
-                Nova Tarefa
-              </Button>
-            </div>
-          </div>
-
-          <TaskFilters onFilterChange={setFilters} />
-
-          <TaskList key={refreshKey} filters={filters} onTaskUpdate={handleTaskUpdate} />
+    <div className="container mx-auto py-8 space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Tarefas</h1>
+          <p className="text-muted-foreground mt-1">Gerencie suas tarefas e lembretes</p>
         </div>
-      </ErrorBoundary>
-    </PageTransition>
+        <div className="flex gap-2">
+          <ExportButton
+            endpoint="/api/export/tasks"
+            filename="tarefas"
+            label="Exportar"
+            variant="outline"
+          />
+          <Button onClick={() => router.push('/dashboard/tasks/new')}>
+            <Plus className="h-4 w-4 mr-2" />
+            Nova Tarefa
+          </Button>
+        </div>
+      </div>
+
+      <TaskFilters onFilterChange={setFilters} />
+
+      <TaskList key={refreshKey} filters={filters} onTaskUpdate={handleTaskUpdate} />
+    </div>
   );
 }

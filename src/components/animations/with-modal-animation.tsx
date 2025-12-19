@@ -1,34 +1,22 @@
 'use client';
 
-import { ComponentType, ReactNode } from 'react';
+import React from 'react';
+import { ModalTransition } from './modal-transition';
 
 interface WithModalAnimationProps {
-  isOpen: boolean;
-  children: ReactNode;
+  children: React.ReactNode;
+  isOpen?: boolean;
   onClose?: () => void;
 }
 
-/**
- * withModalAnimation HOC
- * Wraps modal/dialog components with entrance and exit animations
- *
- * Usage:
- * const AnimatedDialog = withModalAnimation(YourDialogComponent);
- *
- * Features:
- * - Scale-in animation on mount
- * - Scale-out animation on unmount
- * - Synchronized backdrop animation
- * - Smooth transitions
- */
-export function withModalAnimation<P extends WithModalAnimationProps>(Component: ComponentType<P>) {
-  return function WithModalAnimationComponent(props: P) {
-    return (
-      <div className={props.isOpen ? 'modal-transition-wrapper' : 'modal-exit'}>
-        <Component {...props} />
-      </div>
-    );
-  };
+export function withModalAnimation<P extends object>(Component: React.ComponentType<P>) {
+  return React.forwardRef<HTMLDivElement, P & WithModalAnimationProps>(
+    ({ isOpen = true, onClose, ...props }, ref) => (
+      <ModalTransition isOpen={isOpen} onClose={onClose}>
+        <Component {...(props as P)} ref={ref} />
+      </ModalTransition>
+    )
+  );
 }
 
 export default withModalAnimation;

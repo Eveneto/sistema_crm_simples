@@ -402,23 +402,5 @@ export interface AutomationExecutionContext {
 }
 
 // ============================================
-// Export Types
+// Types are already exported individually above
 // ============================================
-
-export type {
-  TriggerType,
-  ActionType,
-  AutomationStatus,
-  Priority,
-  TriggerConditions,
-  AutomationAction,
-  AutomationRule,
-  AutomationLog,
-  AutomationRuleStats,
-  AutomationRuleResponse,
-  AutomationRulesListResponse,
-  AutomationLogsResponse,
-  AutomationStatsResponse,
-  ProcessAutomationResult,
-  AutomationExecutionContext,
-};

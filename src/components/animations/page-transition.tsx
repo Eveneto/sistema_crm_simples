@@ -1,34 +1,23 @@
-import { ReactNode } from 'react';
+'use client';
+
+import React from 'react';
 
 interface PageTransitionProps {
-  children: ReactNode;
-  className?: string;
+  children: React.ReactNode;
+  delay?: number;
 }
 
-/**
- * Page wrapper with smooth fade-in transition
- * Adds automatic fade animation to any page
- */
-export function PageTransition({ children, className = '' }: PageTransitionProps) {
+export const PageTransition: React.FC<PageTransitionProps> = ({ children, delay = 0 }) => {
   return (
     <div
-      className={`animate-in fade-in duration-300 ${className}`}
+      className="animate-in fade-in slide-in-from-bottom-4"
       style={{
-        animation: 'fadeIn 0.3s ease-in-out',
+        animation: `fadeInUp 0.5s ease-out ${delay}ms both`,
       }}
     >
       {children}
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-      `}</style>
     </div>
   );
-}
+};
+
+export default PageTransition;

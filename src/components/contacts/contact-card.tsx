@@ -14,7 +14,7 @@ export function ContactCard({ contact }: ContactCardProps) {
   const position = contact.custom_fields?.position;
 
   return (
-    <Card className="group relative overflow-hidden card-hover transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+    <Card className="group relative overflow-hidden transition-all hover:shadow-md">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="space-y-1">

@@ -1,24 +1,25 @@
 'use client';
 
-import { ReactNode } from 'react';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '@/lib/react-query';
+import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-/**
- * React Query Provider Wrapper
- * 
- * IMPORTANTE: Este é um Client Component que envolve o QueryClientProvider.
- * Isso evita que a instância de classe QueryClient seja serializada
- * quando passada de Server Components para Client Components.
- * 
- * Isso resolve o erro:
- * "Only plain objects, and a few built-ins, can be passed to Client Components
- *  from Server Components. Classes or null prototypes are not supported."
- */
-export function QueryProvider({ children }: { children: ReactNode }) {
-  return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 10, // 10 minutes
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+interface QueryProviderProps {
+  children: React.ReactNode;
 }
+
+export function QueryProvider({ children }: QueryProviderProps) {
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+}
+
+export default QueryProvider;
