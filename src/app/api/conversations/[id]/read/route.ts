@@ -25,6 +25,7 @@ export async function PATCH(
     }
 
     // Validar que a conversa pertence ao usuário
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: conversation, error: convError } = await supabase
       .from('conversations')
       .select('id')

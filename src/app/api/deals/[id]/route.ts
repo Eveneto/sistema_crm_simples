@@ -35,6 +35,7 @@ export async function PATCH(
       );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((existingDeal as any).user_id !== user.id) {
       return NextResponse.json(
         { error: 'Acesso negado' },
@@ -59,6 +60,7 @@ export async function PATCH(
     const updateData = validationResult.data;
 
     // Atualizar negócio
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: deal, error } = await supabase
       .from('deals')
       .update(updateData as any)

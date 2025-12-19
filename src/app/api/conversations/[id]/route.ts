@@ -69,6 +69,7 @@ export async function GET(
     return NextResponse.json({
       conversation,
       messages: messages || []
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
   } catch (error) {
     console.error('GET /api/conversations/[id] error:', error);

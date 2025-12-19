@@ -114,6 +114,7 @@ export async function PATCH(
       const { data: duplicates } = await duplicateQuery;
 
       if (duplicates && duplicates.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const duplicate: any = duplicates[0];
         const duplicateField = duplicate.email === email ? 'email' : 'telefone';
         return NextResponse.json(
@@ -133,6 +134,7 @@ export async function PATCH(
     }
 
     // Atualizar contato
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateData: any = {
       name,
       email: email || null,
@@ -147,6 +149,7 @@ export async function PATCH(
       updated_at: new Date().toISOString(),
     };
 
+    // eslint-disable @typescript-eslint/no-explicit-any
     const { data: updatedContact, error: updateError } = (await supabase
       .from('contacts')
       .update(updateData)

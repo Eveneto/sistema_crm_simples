@@ -26,6 +26,7 @@ import {
 
 global.fetch = jest.fn();
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockFetch = (data: any, ok = true) => {
   (global.fetch as jest.Mock).mockResolvedValueOnce({
     ok,

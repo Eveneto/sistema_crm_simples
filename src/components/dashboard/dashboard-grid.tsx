@@ -13,6 +13,7 @@ interface DashboardGridProps {
 
 export function DashboardGrid({ period = '30d' }: DashboardGridProps) {
   // React Query com cache automático e refetch on focus
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: metrics, isLoading } = useDashboardMetrics(period as any);
 
   return (

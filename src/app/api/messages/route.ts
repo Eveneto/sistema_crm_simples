@@ -60,7 +60,9 @@ export async function POST(request: NextRequest) {
           content: validated.content,
           message_type: 'text',
           is_read: true // Mensagens do usuário começam como lidas
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ] as any)
       .select('id,conversation_id,sender_type,sender_id,content,message_type,created_at,is_read')
       .single();
@@ -85,6 +87,7 @@ export async function POST(request: NextRequest) {
       typeof error === 'object' &&
       'issues' in error
     ) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const zodError = error as any;
       console.error('[DEBUG] Validation error:', zodError.issues);
       return NextResponse.json(

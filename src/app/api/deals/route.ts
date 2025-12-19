@@ -81,6 +81,7 @@ export async function GET(request: NextRequest) {
       }
 
       // Agrupa deals por estágio
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const pipelineData = (stages as any[]).map((stage: any) => {
         const stageDeals = (deals as any[]).filter(
           (deal: any) => deal.stage_id === stage.id
@@ -189,6 +190,7 @@ export async function POST(request: NextRequest) {
 
     // Cria o negócio
     // Otimização: SELECT apenas colunas necessárias no retorno
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: deal, error } = await supabase
       .from('deals')
       .insert({

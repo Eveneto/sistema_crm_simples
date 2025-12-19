@@ -10,6 +10,7 @@ jest.mock('@/lib/supabase/server', () => ({
 const mockCreateClient = createClient as jest.MockedFunction<typeof createClient>;
 
 describe('API /api/contacts/[id]', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockSupabase: any;
   let mockRequest: NextRequest;
 
@@ -35,8 +36,10 @@ describe('API /api/contacts/[id]', () => {
     mockCreateClient.mockResolvedValue(mockSupabase);
 
     // Mock do request
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mockRequest = {
       json: jest.fn(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
   });
 

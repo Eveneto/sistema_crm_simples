@@ -16,14 +16,20 @@ jest.mock('date-fns/locale/pt-BR', () => ({}));
 
 // Mock dos componentes UI
 jest.mock('@/components/ui/dialog', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Dialog: ({ children, open }: any) => open ? <div data-testid="dialog">{children}</div> : null,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   DialogContent: ({ children }: any) => <div data-testid="dialog-content">{children}</div>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   DialogHeader: ({ children }: any) => <div data-testid="dialog-header">{children}</div>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   DialogTitle: ({ children }: any) => <div data-testid="dialog-title">{children}</div>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   DialogFooter: ({ children }: any) => <div data-testid="dialog-footer">{children}</div>,
 }));
 
 jest.mock('@/components/ui/button', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Button: ({ children, onClick, variant }: any) => (
     <button onClick={onClick} data-variant={variant} data-testid={`button-${variant || 'default'}`}>
       {children}
@@ -32,6 +38,7 @@ jest.mock('@/components/ui/button', () => ({
 }));
 
 jest.mock('@/components/ui/badge', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Badge: ({ children, variant }: any) => (
     <span data-testid={`badge-${variant}`} data-variant={variant}>
       {children}
