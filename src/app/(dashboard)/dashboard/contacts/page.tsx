@@ -32,6 +32,7 @@ import { ContactsListSkeleton } from '@/components/contacts/contacts-list-skelet
 import { ContactForm } from '@/components/contacts/contact-form';
 import { TagFilter } from '@/components/contacts/tag-filter';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 import { PageTransition } from '@/components/animations/page-transition';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -44,6 +45,7 @@ export default function ContactsPage() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
 
   const debouncedSearch = useDebounce(search, 300);
 
@@ -123,8 +125,18 @@ export default function ContactsPage() {
   };
 
   const handleCreateSuccess = () => {
+    // Invalidar cache de contatos para forçar refetch
+    queryClient.invalidateQueries({
+      queryKey: ['contacts'],
+    });
+
     setIsCreateModalOpen(false);
     router.push('/dashboard/contacts');
+
+    toast({
+      title: 'Sucesso',
+      description: 'Contato criado com sucesso',
+    });
   };
 
   const handleCreateCancel = () => {
