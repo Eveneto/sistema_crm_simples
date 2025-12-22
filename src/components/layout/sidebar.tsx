@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
   LayoutDashboard,
-  Users,
   MessageSquare,
   FolderKanban,
   ChevronLeft,
@@ -29,11 +28,12 @@ const navItems: NavItem[] = [
     href: '/dashboard',
     icon: LayoutDashboard,
   },
-  {
-    title: 'Contatos',
-    href: '/dashboard/contacts',
-    icon: Users,
-  },
+  // TODO: Desabilitar temporariamente enquanto resolvemos bugs de renderização
+  // {
+  //   title: 'Contatos',
+  //   href: '/dashboard/contacts',
+  //   icon: Users,
+  // },
   {
     title: 'Conversas',
     href: '/dashboard/conversations',
