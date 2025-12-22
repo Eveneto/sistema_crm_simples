@@ -11,7 +11,7 @@ export const revalidate = 0;
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Dashboard - CRM Simplificado',
+  title: 'Dashboard - CRM',
   description: 'Sistema de CRM para gestão de clientes e vendas',
 };
 

@@ -5,7 +5,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata = {
-  title: 'CRM Simplificado - Login',
+  title: 'CRM - Login',
   description: 'Sistema de CRM para gestão de clientes e vendas',
 };
 

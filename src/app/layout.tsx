@@ -8,7 +8,7 @@ import { QueryProvider } from '@/components/providers/query-provider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'CRM Simplificado',
+  title: 'CRM',
   description: 'Sistema de CRM completo com integração WhatsApp',
 };
 
