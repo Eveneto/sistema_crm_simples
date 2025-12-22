@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
           id: stage.id,
           name: stage.name,
           color: stage.color,
-          order_position: stage.order_position,
+          order_position: stage.position,
           deals: stageDeals,
           count: stageDeals.length,
           total_value: totalValue,
