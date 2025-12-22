@@ -226,7 +226,13 @@ export default function ContactsPage() {
   }
 
   // No contacts state
-  if (contacts.length === 0 && !debouncedSearch) {
+  if (!contacts || (contacts.length === 0 && !debouncedSearch)) {
+    console.log(
+      '[ContactsPage] No contacts state: contacts=',
+      contacts,
+      'debouncedSearch=',
+      debouncedSearch
+    );
     return (
       <PageTransition>
         <ErrorBoundary sectionName="Contatos">
@@ -278,7 +284,8 @@ export default function ContactsPage() {
   }
 
   // No results state (from search)
-  if (filteredContacts.length === 0) {
+  if (!filteredContacts || filteredContacts.length === 0) {
+    console.log('[ContactsPage] No results state: filteredContacts=', filteredContacts);
     return (
       <PageTransition>
         <ErrorBoundary sectionName="Contatos">
@@ -307,7 +314,7 @@ export default function ContactsPage() {
                 </div>
               </Card>
 
-              {extractedTags.length > 0 && (
+              {extractedTags && extractedTags.length > 0 && (
                 <Card className="p-4">
                   <TagFilter value={selectedTags} onChange={handleTagChange} tags={extractedTags} />
                 </Card>
@@ -378,7 +385,7 @@ export default function ContactsPage() {
               </div>
             </Card>
 
-            {extractedTags.length > 0 && (
+            {extractedTags && extractedTags.length > 0 && (
               <Card className="p-4">
                 <TagFilter value={selectedTags} onChange={handleTagChange} tags={extractedTags} />
               </Card>
