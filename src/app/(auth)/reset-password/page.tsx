@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { getCallbackUrl } from '@/lib/utils/url';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,8 +31,9 @@ export default function ResetPasswordPage() {
     setIsLoading(true);
 
     try {
+      const redirectUrl = getCallbackUrl('/update-password');
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/update-password`,
+        redirectTo: redirectUrl,
       });
 
       if (error) {
