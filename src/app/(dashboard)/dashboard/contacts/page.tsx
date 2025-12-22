@@ -12,18 +12,26 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Users, Search, Plus, AlertCircle } from 'lucide-react';
 import { useContacts } from '@/hooks/use-contacts-query';
 import { useDebounce } from '@/hooks/use-debounce';
 import { ContactCard } from '@/components/contacts/contact-card';
 import { ContactsListSkeleton } from '@/components/contacts/contacts-list-skeleton';
+import { ContactForm } from '@/components/contacts/contact-form';
 import { TagFilter } from '@/components/contacts/tag-filter';
-import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from '@/hooks/use-toast';
 import { PageTransition } from '@/components/animations/page-transition';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -32,6 +40,10 @@ export default function ContactsPage() {
   const [search, setSearch] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [page, setPage] = useState(1);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const debouncedSearch = useDebounce(search, 300);
 
@@ -86,6 +98,13 @@ export default function ContactsPage() {
     });
   }, [contacts, selectedTags]);
 
+  // Abrir modal se tiver ?modal=new na URL
+  useEffect(() => {
+    if (searchParams?.get('modal') === 'new') {
+      setIsCreateModalOpen(true);
+    }
+  }, [searchParams]);
+
   const handleSearchChange = (value: string) => {
     setSearch(value);
     setPage(1); // Reset to page 1 when searching
@@ -103,6 +122,15 @@ export default function ContactsPage() {
     });
   };
 
+  const handleCreateSuccess = () => {
+    setIsCreateModalOpen(false);
+    router.push('/dashboard/contacts');
+  };
+
+  const handleCreateCancel = () => {
+    setIsCreateModalOpen(false);
+  };
+
   // Loading state
   if (isLoading) {
     return (
@@ -114,12 +142,10 @@ export default function ContactsPage() {
                 <h1 className="text-3xl font-bold tracking-tight">Contatos</h1>
                 <p className="text-muted-foreground mt-2">Gerencie todos os seus contatos</p>
               </div>
-              <Link href="/dashboard/contacts/new">
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Novo Contato
-                </Button>
-              </Link>
+              <Button onClick={() => setIsCreateModalOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Novo Contato
+              </Button>
             </div>
 
             <Card className="p-6">
@@ -143,12 +169,10 @@ export default function ContactsPage() {
                 <h1 className="text-3xl font-bold tracking-tight">Contatos</h1>
                 <p className="text-muted-foreground mt-2">Gerencie todos os seus contatos</p>
               </div>
-              <Link href="/dashboard/contacts/new">
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Novo Contato
-                </Button>
-              </Link>
+              <Button onClick={() => setIsCreateModalOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Novo Contato
+              </Button>
             </div>
 
             <Alert variant="destructive">
@@ -172,12 +196,10 @@ export default function ContactsPage() {
                 <h1 className="text-3xl font-bold tracking-tight">Contatos</h1>
                 <p className="text-muted-foreground mt-2">Gerencie todos os seus contatos</p>
               </div>
-              <Link href="/dashboard/contacts/new">
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Novo Contato
-                </Button>
-              </Link>
+              <Button onClick={() => setIsCreateModalOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Novo Contato
+              </Button>
             </div>
 
             <Card className="flex flex-col items-center justify-center py-12">
@@ -186,14 +208,30 @@ export default function ContactsPage() {
               <p className="text-muted-foreground text-sm mt-1">
                 Comece adicionando seu primeiro contato
               </p>
-              <Link href="/dashboard/contacts/new" className="mt-4">
-                <Button variant="outline">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Criar Primeiro Contato
-                </Button>
-              </Link>
+              <Button variant="outline" onClick={() => setIsCreateModalOpen(true)} className="mt-4">
+                <Plus className="mr-2 h-4 w-4" />
+                Criar Primeiro Contato
+              </Button>
             </Card>
           </div>
+
+          {/* Modal de Criar Contato */}
+          <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Criar Novo Contato</DialogTitle>
+                <DialogDescription>Preencha os dados do novo contato abaixo</DialogDescription>
+              </DialogHeader>
+
+              <div className="mt-4 pr-4">
+                <ContactForm
+                  mode="create"
+                  onSuccess={handleCreateSuccess}
+                  onCancel={handleCreateCancel}
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
         </ErrorBoundary>
       </PageTransition>
     );
@@ -210,12 +248,10 @@ export default function ContactsPage() {
                 <h1 className="text-3xl font-bold tracking-tight">Contatos</h1>
                 <p className="text-muted-foreground mt-2">Gerencie todos os seus contatos</p>
               </div>
-              <Link href="/dashboard/contacts/new">
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Novo Contato
-                </Button>
-              </Link>
+              <Button onClick={() => setIsCreateModalOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Novo Contato
+              </Button>
             </div>
 
             <div className="flex flex-col gap-4">
@@ -246,6 +282,24 @@ export default function ContactsPage() {
               </Card>
             </div>
           </div>
+
+          {/* Modal de Criar Contato */}
+          <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Criar Novo Contato</DialogTitle>
+                <DialogDescription>Preencha os dados do novo contato abaixo</DialogDescription>
+              </DialogHeader>
+
+              <div className="mt-4 pr-4">
+                <ContactForm
+                  mode="create"
+                  onSuccess={handleCreateSuccess}
+                  onCancel={handleCreateCancel}
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
         </ErrorBoundary>
       </PageTransition>
     );
@@ -264,12 +318,10 @@ export default function ContactsPage() {
                 Gerencie todos os seus contatos ({pagination.total} total)
               </p>
             </div>
-            <Link href="/dashboard/contacts/new">
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Novo Contato
-              </Button>
-            </Link>
+            <Button onClick={() => setIsCreateModalOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Novo Contato
+            </Button>
           </div>
 
           {/* Search and Filters */}
@@ -339,6 +391,24 @@ export default function ContactsPage() {
             </div>
           )}
         </div>
+
+        {/* Modal de Criar Contato */}
+        <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+          <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Criar Novo Contato</DialogTitle>
+              <DialogDescription>Preencha os dados do novo contato abaixo</DialogDescription>
+            </DialogHeader>
+
+            <div className="mt-4 pr-4">
+              <ContactForm
+                mode="create"
+                onSuccess={handleCreateSuccess}
+                onCancel={handleCreateCancel}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       </ErrorBoundary>
     </PageTransition>
   );
