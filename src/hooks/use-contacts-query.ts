@@ -56,14 +56,23 @@ export function useContacts(options: UseContactsOptions = {}) {
 
       const json = await response.json();
       console.log('[useContacts] Response:', json);
+      console.log('[useContacts] Response.pagination:', json.pagination);
 
       // O endpoint retorna { data, pagination } mas esperamos { contacts, pagination }
       const result = {
         contacts: json.data || [],
-        pagination: json.pagination,
+        pagination: json.pagination || {
+          page: 1,
+          limit: 50,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
       };
 
       console.log('[useContacts] Mapped result:', result);
+      console.log('[useContacts] Mapped pagination:', result.pagination);
       return result as Promise<ContactsResponse>;
     },
 

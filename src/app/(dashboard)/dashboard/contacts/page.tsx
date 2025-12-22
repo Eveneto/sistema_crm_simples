@@ -74,20 +74,21 @@ export default function ContactsPage() {
   }, [contactsResponse]);
 
   const pagination = useMemo(() => {
-    return (
-      contactsResponse?.pagination || {
-        page: 1,
-        limit: 20,
-        total: 0,
-        totalPages: 0,
-        hasPrev: false,
-        hasNext: false,
-      }
-    );
+    const result = contactsResponse?.pagination || {
+      page: 1,
+      limit: 20,
+      total: 0,
+      totalPages: 0,
+      hasPrev: false,
+      hasNext: false,
+    };
+    console.log('[ContactsPage] pagination memoized:', result);
+    return result;
   }, [contactsResponse]);
 
   // Extract unique tags from contacts
   const extractedTags = useMemo(() => {
+    console.log('[ContactsPage] Extracting tags from', contacts.length, 'contacts');
     const tags = new Set<string>();
     contacts.forEach((contact) => {
       if (contact.tags && Array.isArray(contact.tags)) {
@@ -96,17 +97,31 @@ export default function ContactsPage() {
         });
       }
     });
-    return Array.from(tags).sort();
+    const result = Array.from(tags).sort();
+    console.log('[ContactsPage] extractedTags:', result);
+    return result;
   }, [contacts]);
 
   // Filter contacts by selected tags
   const filteredContacts = useMemo(() => {
-    if (selectedTags.length === 0) return contacts;
+    console.log(
+      '[ContactsPage] Filtering contacts. selectedTags:',
+      selectedTags,
+      'contacts:',
+      contacts.length
+    );
+    if (!selectedTags || selectedTags.length === 0) {
+      console.log('[ContactsPage] No tags selected, returning all contacts');
+      return contacts;
+    }
 
-    return contacts.filter((contact) => {
+    const result = contacts.filter((contact) => {
       if (!contact.tags || contact.tags.length === 0) return false;
       return selectedTags.some((tag) => contact.tags?.includes(tag));
     });
+
+    console.log('[ContactsPage] filteredContacts:', result.length);
+    return result;
   }, [contacts, selectedTags]);
 
   // Abrir modal se tiver ?modal=new na URL
