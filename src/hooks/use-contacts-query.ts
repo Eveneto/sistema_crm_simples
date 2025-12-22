@@ -21,13 +21,13 @@ interface UseContactsOptions {
 
 /**
  * Hook para buscar contatos com cache
- * 
+ *
  * Usa React Query para:
  * - Cache automático (5 minutos)
  * - Refetch inteligente
  * - Retry automático
  * - Sincronização
- * 
+ *
  * @example
  * const { data, isLoading, error } = useContacts({ page: 1, search: 'João' })
  */
@@ -43,13 +43,28 @@ export function useContacts(options: UseContactsOptions = {}) {
         ...(search && { search }),
       });
 
-      const response = await fetch(`/api/contacts?${params}`);
+      const url = `/api/contacts?${params}`;
+      console.log('[useContacts] Fetching:', url);
+
+      const response = await fetch(url);
 
       if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        console.error('[useContacts] Error response:', error);
         throw new Error('Failed to fetch contacts');
       }
 
-      return response.json() as Promise<ContactsResponse>;
+      const json = await response.json();
+      console.log('[useContacts] Response:', json);
+
+      // O endpoint retorna { data, pagination } mas esperamos { contacts, pagination }
+      const result = {
+        contacts: json.data || [],
+        pagination: json.pagination,
+      };
+
+      console.log('[useContacts] Mapped result:', result);
+      return result as Promise<ContactsResponse>;
     },
 
     // Cache por 5 minutos

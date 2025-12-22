@@ -60,8 +60,17 @@ export default function ContactsPage() {
     limit: 20,
   });
 
+  // Debug logs
+  useEffect(() => {
+    console.log('[ContactsPage] contactsResponse:', contactsResponse);
+    console.log('[ContactsPage] isLoading:', isLoading);
+    console.log('[ContactsPage] error:', error);
+  }, [contactsResponse, isLoading, error]);
+
   const contacts = useMemo(() => {
-    return contactsResponse?.contacts || [];
+    const result = contactsResponse?.contacts || [];
+    console.log('[ContactsPage] contacts memoized:', result);
+    return result;
   }, [contactsResponse]);
 
   const pagination = useMemo(() => {
@@ -125,10 +134,14 @@ export default function ContactsPage() {
   };
 
   const handleCreateSuccess = () => {
+    console.log('[ContactsPage] handleCreateSuccess called');
+
     // Invalidar cache de contatos para forçar refetch
     queryClient.invalidateQueries({
       queryKey: ['contacts'],
     });
+
+    console.log('[ContactsPage] Cache invalidated, forcing refetch');
 
     setIsCreateModalOpen(false);
     router.push('/dashboard/contacts');
