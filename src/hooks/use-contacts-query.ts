@@ -44,19 +44,14 @@ export function useContacts(options: UseContactsOptions = {}) {
       });
 
       const url = `/api/contacts?${params}`;
-      console.log('[useContacts] Fetching:', url);
 
       const response = await fetch(url);
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        console.error('[useContacts] Error response:', error);
         throw new Error('Failed to fetch contacts');
       }
 
       const json = await response.json();
-      console.log('[useContacts] Response:', json);
-      console.log('[useContacts] Response.pagination:', json.pagination);
 
       // O endpoint retorna { data, pagination } mas esperamos { contacts, pagination }
       const result = {
@@ -71,8 +66,6 @@ export function useContacts(options: UseContactsOptions = {}) {
         },
       };
 
-      console.log('[useContacts] Mapped result:', result);
-      console.log('[useContacts] Mapped pagination:', result.pagination);
       return result as Promise<ContactsResponse>;
     },
 

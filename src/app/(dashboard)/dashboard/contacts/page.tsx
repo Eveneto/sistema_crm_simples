@@ -62,14 +62,18 @@ export default function ContactsPage() {
 
   // Debug logs
   useEffect(() => {
-    console.log('[ContactsPage] contactsResponse:', contactsResponse);
-    console.log('[ContactsPage] isLoading:', isLoading);
-    console.log('[ContactsPage] error:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ContactsPage] contactsResponse:', contactsResponse);
+      console.log('[ContactsPage] isLoading:', isLoading);
+      console.log('[ContactsPage] error:', error);
+    }
   }, [contactsResponse, isLoading, error]);
 
   const contacts = useMemo(() => {
     const result = contactsResponse?.contacts || [];
-    console.log('[ContactsPage] contacts memoized:', result);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ContactsPage] contacts memoized:', result);
+    }
     return result;
   }, [contactsResponse]);
 
@@ -82,13 +86,17 @@ export default function ContactsPage() {
       hasPrev: false,
       hasNext: false,
     };
-    console.log('[ContactsPage] pagination memoized:', result);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ContactsPage] pagination memoized:', result);
+    }
     return result;
   }, [contactsResponse]);
 
   // Extract unique tags from contacts
   const extractedTags = useMemo(() => {
-    console.log('[ContactsPage] Extracting tags from', contacts.length, 'contacts');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ContactsPage] Extracting tags from', contacts.length, 'contacts');
+    }
     const tags = new Set<string>();
     contacts.forEach((contact) => {
       if (contact.tags && Array.isArray(contact.tags)) {
@@ -98,20 +106,26 @@ export default function ContactsPage() {
       }
     });
     const result = Array.from(tags).sort();
-    console.log('[ContactsPage] extractedTags:', result);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ContactsPage] extractedTags:', result);
+    }
     return result;
   }, [contacts]);
 
   // Filter contacts by selected tags
   const filteredContacts = useMemo(() => {
-    console.log(
-      '[ContactsPage] Filtering contacts. selectedTags:',
-      selectedTags,
-      'contacts:',
-      contacts.length
-    );
+    if (process.env.NODE_ENV === 'development') {
+      console.log(
+        '[ContactsPage] Filtering contacts. selectedTags:',
+        selectedTags,
+        'contacts:',
+        contacts.length
+      );
+    }
     if (!selectedTags || selectedTags.length === 0) {
-      console.log('[ContactsPage] No tags selected, returning all contacts');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[ContactsPage] No tags selected, returning all contacts');
+      }
       return contacts;
     }
 
@@ -120,7 +134,9 @@ export default function ContactsPage() {
       return selectedTags.some((tag) => contact.tags?.includes(tag));
     });
 
-    console.log('[ContactsPage] filteredContacts:', result.length);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ContactsPage] filteredContacts:', result.length);
+    }
     return result;
   }, [contacts, selectedTags]);
 
@@ -141,22 +157,11 @@ export default function ContactsPage() {
     setPage(1); // Reset to page 1 when filtering
   };
 
-  const handleContactDeleted = () => {
-    toast({
-      title: 'Sucesso',
-      description: 'Contato deletado com sucesso',
-    });
-  };
-
   const handleCreateSuccess = () => {
-    console.log('[ContactsPage] handleCreateSuccess called');
-
     // Invalidar cache de contatos para forçar refetch
     queryClient.invalidateQueries({
       queryKey: ['contacts'],
     });
-
-    console.log('[ContactsPage] Cache invalidated, forcing refetch');
 
     setIsCreateModalOpen(false);
     router.push('/dashboard/contacts');
@@ -227,12 +232,6 @@ export default function ContactsPage() {
 
   // No contacts state
   if (!contacts || (contacts.length === 0 && !debouncedSearch)) {
-    console.log(
-      '[ContactsPage] No contacts state: contacts=',
-      contacts,
-      'debouncedSearch=',
-      debouncedSearch
-    );
     return (
       <PageTransition>
         <ErrorBoundary sectionName="Contatos">
@@ -285,7 +284,6 @@ export default function ContactsPage() {
 
   // No results state (from search)
   if (!filteredContacts || filteredContacts.length === 0) {
-    console.log('[ContactsPage] No results state: filteredContacts=', filteredContacts);
     return (
       <PageTransition>
         <ErrorBoundary sectionName="Contatos">
@@ -395,11 +393,7 @@ export default function ContactsPage() {
           {/* Contacts Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredContacts.map((contact) => (
-              <ContactCard
-                key={contact.id}
-                contact={contact}
-                onContactDeleted={handleContactDeleted}
-              />
+              <ContactCard key={contact.id} contact={contact} />
             ))}
           </div>
 
