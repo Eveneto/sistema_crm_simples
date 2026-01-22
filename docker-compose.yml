@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # PostgreSQL para Evolution API
+  postgres:
+    image: postgres:15-alpine
+    container_name: evolution_postgres
+    environment:
+      POSTGRES_USER: evolution_user
+      POSTGRES_PASSWORD: evolution_secure_pass_2024
+      POSTGRES_DB: evolution_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evolution_user -d evolution_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - evolution_network
+
+  # Evolution API
+  evolution_api:
+    image: atendai/evolution-api:latest
+    container_name: evolution_api
+    restart: always
+    environment:
+      # Database
+      DATABASE_URL: postgresql://evolution_user:evolution_secure_pass_2024@postgres:5432/evolution_db
+      DATABASE_TYPE: postgres
+      
+      # Servidor
+      SERVER_URL: http://localhost:3000
+      SERVER_PORT: 3000
+      
+      # JWT
+      JWT_EXPIRATION_TIME: 86400
+      JWT_SECRET: your_jwt_secret_key_change_this_in_production
+      
+      # Webhook (seu CRM receberá aqui)
+      WEBHOOK_URL: http://localhost:3001/api/webhook/whatsapp
+      
+      # Aqui é importante: configure seu token webhook
+      WEBHOOK_TOKEN: your_webhook_token_change_this
+      
+      # Tivado para usar Baileys (WhatsApp Web)
+      INTEGRATIONS_ENABLED: '["evolution"]'
+      
+      # HTTPS (false para desenvolvimento local)
+      HTTPS: 'false'
+      
+      # Log
+      LOG_LEVEL: info
+      
+      # Autenticação básica (opcional)
+      API_KEY: your_api_key_change_this
+      
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - evolution_sessions:/evolution/sessions
+      - evolution_logs:/evolution/logs
+    networks:
+      - evolution_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis (opcional, mas recomendado para cache)
+  redis:
+    image: redis:7-alpine
+    container_name: evolution_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - evolution_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  evolution_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  evolution_sessions:
+  evolution_logs:
+  redis_data:

@@ -1,0 +1,100 @@
+version: '3.9'
+
+services:
+  # PostgreSQL para Evolution API
+  evolution_postgres:
+    image: postgres:15-alpine
+    container_name: evolution_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: evolution_password
+      POSTGRES_DB: evolution
+    ports:
+      - "5435:5432"
+    volumes:
+      - evolution_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - evolution_network
+
+  # Redis para Evolution API
+  evolution_redis:
+    image: redis:7-alpine
+    container_name: evolution_redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - evolution_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - evolution_network
+
+  # Evolution API v2
+  evolution_api:
+    image: atendai/evolution-api:v2.1.1
+    container_name: evolution_api
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      # Server
+      SERVER_URL: http://localhost:8080
+      
+      # Autenticação
+      AUTHENTICATION_API_KEY: mude-me
+      
+      # Database
+      DATABASE_ENABLED: "true"
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://postgres:evolution_password@evolution_postgres:5432/evolution
+      DATABASE_SAVE_DATA_INSTANCE: "true"
+      DATABASE_SAVE_DATA_NEW_MESSAGE: "true"
+      DATABASE_SAVE_MESSAGE_UPDATE: "true"
+      DATABASE_SAVE_DATA_CONTACTS: "true"
+      DATABASE_SAVE_DATA_CHATS: "true"
+      
+      # Redis Cache
+      CACHE_REDIS_ENABLED: "true"
+      CACHE_REDIS_URI: redis://evolution_redis:6379/1
+      CACHE_REDIS_PREFIX_KEY: evolution_v2
+      
+      # Webhook
+      WEBHOOK_GLOBAL_URL: http://localhost:3001
+      
+      # Logs
+      LOG_LEVEL: info
+    
+    volumes:
+      - evolution_instances:/evolution/instances
+    
+    depends_on:
+      evolution_postgres:
+        condition: service_healthy
+      evolution_redis:
+        condition: service_healthy
+    
+    networks:
+      - evolution_network
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  evolution_postgres_data:
+  evolution_redis_data:
+  evolution_instances:
+
+networks:
+  evolution_network:
+    driver: bridge
