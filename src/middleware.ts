@@ -60,6 +60,17 @@ export async function middleware(request: NextRequest) {
 
   // Atualizar sessão (importante para manter usuário logado)
   try {
+    // Apenas verificar autenticação se estiver acessando rotas protegidas
+    const protectedRoutes = ['/dashboard', '/(authenticated)'];
+    const isProtectedRoute = protectedRoutes.some((route) =>
+      request.nextUrl.pathname.startsWith(route)
+    );
+
+    if (!isProtectedRoute) {
+      // Se não é rota protegida, pular verificação demorada
+      return response;
+    }
+
     const {
       data: { user },
       error,
