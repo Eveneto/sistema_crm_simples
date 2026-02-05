@@ -2,7 +2,7 @@
  * MessageInput Component
  * Message input with validation
  * Integrates with POST /api/messages
- * 
+ *
  * Padrão: Shadcn/ui com Tailwind
  */
 
@@ -22,11 +22,7 @@ interface MessageInputProps {
   disabled?: boolean;
 }
 
-export function MessageInput({
-  conversationId,
-  onMessageSent,
-  disabled
-}: MessageInputProps) {
+export function MessageInput({ conversationId, onMessageSent, disabled }: MessageInputProps) {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -40,8 +36,8 @@ export function MessageInput({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           conversation_id: conversationId,
-          content: content.trim()
-        })
+          content: content.trim(),
+        }),
       });
 
       if (!response.ok) {
@@ -51,21 +47,20 @@ export function MessageInput({
 
       const message = await response.json();
       setContent('');
-      
+
       if (onMessageSent) {
         onMessageSent(message);
       }
 
       toast({
-        description: 'Mensagem enviada'
+        description: 'Mensagem enviada',
       });
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
         title: 'Erro',
-        description:
-          error instanceof Error ? error.message : 'Erro ao enviar mensagem',
-        variant: 'destructive'
+        description: error instanceof Error ? error.message : 'Erro ao enviar mensagem',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -80,29 +75,22 @@ export function MessageInput({
   };
 
   return (
-    <div className={cn(
-      'flex gap-2 p-4 border-t',
-      'bg-card'
-    )}>
+    <div className={cn('flex gap-2 p-4 border-t', 'bg-card/80 backdrop-blur')}>
       <Input
         value={content}
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Digite uma mensagem..."
         disabled={disabled || loading}
-        className="flex-1 h-9"
+        className="flex-1 h-10 rounded-full bg-muted/30 px-4"
       />
       <Button
         onClick={handleSend}
         disabled={disabled || loading || !content.trim()}
         size="sm"
-        className="px-3"
+        className="h-10 w-10 rounded-full p-0"
       >
-        {loading ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
-        ) : (
-          <Send className="w-4 h-4" />
-        )}
+        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
       </Button>
     </div>
   );
