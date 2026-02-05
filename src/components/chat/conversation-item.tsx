@@ -2,7 +2,7 @@
  * ConversationItem Component
  * Item individual na lista de conversas
  * Mostra contato, última mensagem, badge de não-lido
- * 
+ *
  * Padrão: Shadcn/ui com Tailwind
  */
 
@@ -21,15 +21,11 @@ interface ConversationItemProps {
   onClick: () => void;
 }
 
-export function ConversationItem({
-  conversation,
-  isActive,
-  onClick
-}: ConversationItemProps) {
+export function ConversationItem({ conversation, isActive, onClick }: ConversationItemProps) {
   const lastMessageTime = conversation.last_message_at
     ? formatDistanceToNow(new Date(conversation.last_message_at), {
         locale: ptBR,
-        addSuffix: true
+        addSuffix: true,
       })
     : 'Agora';
 
@@ -43,8 +39,8 @@ export function ConversationItem({
       onClick={onClick}
       className={cn(
         'w-full text-left px-3 py-2 rounded-md transition-colors',
-        'hover:bg-accent hover:text-accent-foreground',
-        isActive && 'bg-primary text-primary-foreground'
+        'hover:bg-muted/40',
+        isActive && 'bg-muted/60 ring-1 ring-border'
       )}
     >
       <div className="flex items-start gap-3">
@@ -54,9 +50,7 @@ export function ConversationItem({
             src={conversation.contact?.avatar_url || undefined}
             alt={conversation.contact?.name}
           />
-          <AvatarFallback>
-            {conversation.contact?.name?.[0]?.toUpperCase()}
-          </AvatarFallback>
+          <AvatarFallback>{conversation.contact?.name?.[0]?.toUpperCase()}</AvatarFallback>
         </Avatar>
 
         {/* Content */}
@@ -77,18 +71,12 @@ export function ConversationItem({
           </div>
 
           {/* Last message preview */}
-          <p className={cn(
-            'text-xs truncate',
-            isActive ? 'opacity-80' : 'text-muted-foreground'
-          )}>
+          <p className={cn('text-xs truncate', isActive ? 'opacity-80' : 'text-muted-foreground')}>
             {lastMessagePreview}
           </p>
 
           {/* Time */}
-          <p className={cn(
-            'text-xs',
-            isActive ? 'opacity-70' : 'text-muted-foreground/70'
-          )}>
+          <p className={cn('text-xs', isActive ? 'opacity-70' : 'text-muted-foreground/70')}>
             {lastMessageTime}
           </p>
         </div>

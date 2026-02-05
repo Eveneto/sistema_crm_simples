@@ -2,7 +2,7 @@
  * ChatWindow Component
  * Main chat interface
  * Composed of: Header + MessageList + MessageInput
- * 
+ *
  * Padrão: Shadcn/ui com Tailwind
  */
 
@@ -32,7 +32,7 @@ export function ChatWindow({
   currentUserId,
   onSendMessage,
   onClose,
-  loading
+  loading,
 }: ChatWindowProps) {
   const handleSendMessage = async (message: Message) => {
     await onSendMessage(message);
@@ -43,19 +43,16 @@ export function ChatWindow({
       {/* ============================================ */}
       {/* Header */}
       {/* ============================================ */}
-      <div className={cn(
-        'flex items-center justify-between p-4 border-b',
-        'bg-card'
-      )}>
+      <div
+        className={cn('flex items-center justify-between p-4 border-b', 'bg-card/80 backdrop-blur')}
+      >
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
             <AvatarImage
               src={conversation.contact?.avatar_url || undefined}
               alt={conversation.contact?.name}
             />
-            <AvatarFallback>
-              {conversation.contact?.name?.[0]?.toUpperCase()}
-            </AvatarFallback>
+            <AvatarFallback>{conversation.contact?.name?.[0]?.toUpperCase()}</AvatarFallback>
           </Avatar>
 
           <div className="flex-1">
@@ -70,20 +67,10 @@ export function ChatWindow({
 
         {/* Actions */}
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            title="Ligar"
-            className="h-8 w-8 p-0"
-          >
+          <Button variant="ghost" size="sm" title="Ligar" className="h-8 w-8 p-0">
             <Phone className="w-4 h-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            title="Mais opções"
-            className="h-8 w-8 p-0"
-          >
+          <Button variant="ghost" size="sm" title="Mais opções" className="h-8 w-8 p-0">
             <MoreVertical className="w-4 h-4" />
           </Button>
           {onClose && (

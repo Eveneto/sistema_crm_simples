@@ -2,7 +2,7 @@
  * MessageList Component
  * Message list renderer with auto-scroll
  * Auto-scrolls to bottom on new messages
- * 
+ *
  * Padrão: Shadcn/ui com Tailwind
  */
 
@@ -21,12 +21,7 @@ interface MessageListProps {
   loading?: boolean;
 }
 
-export function MessageList({
-  messages,
-  currentUserId,
-  contactName,
-  loading
-}: MessageListProps) {
+export function MessageList({ messages, currentUserId, contactName, loading }: MessageListProps) {
   const endRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom on new messages
@@ -35,10 +30,7 @@ export function MessageList({
   }, [messages]);
 
   return (
-    <div className={cn(
-      'flex-1 overflow-y-auto p-4 space-y-3',
-      'bg-muted/10'
-    )}>
+    <div className={cn('flex-1 overflow-y-auto p-5 space-y-2', 'bg-muted/5')}>
       {messages.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
           <MessageCircle className="h-12 w-12 mb-3 opacity-30" />
@@ -51,9 +43,7 @@ export function MessageList({
             key={message.id}
             message={message}
             isOwn={message.sender_id === currentUserId}
-            senderName={
-              message.sender_id !== currentUserId ? contactName : undefined
-            }
+            senderName={message.sender_id !== currentUserId ? contactName : undefined}
           />
         ))
       )}
