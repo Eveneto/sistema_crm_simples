@@ -12,6 +12,7 @@ import {
   FolderKanban,
   ChevronLeft,
   ChevronRight,
+  Users2,
 } from 'lucide-react';
 import { useUserRole } from '@/hooks/use-user-role';
 
@@ -43,6 +44,11 @@ const navItems: NavItem[] = [
     title: 'Negócios',
     href: '/dashboard/deals/pipeline',
     icon: FolderKanban,
+  },
+  {
+    title: 'Chat da equipe',
+    href: '/team-chat',
+    icon: Users2,
   },
 ];
 
